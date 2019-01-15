@@ -11,6 +11,7 @@ import ni.jug.cb.exchangerate.ExchangeRateCBClient;
 import ni.jug.cb.exchangerate.ExchangeRateTrade;
 import ni.jug.ncb.exchangerate.ExchangeRateBCNClient;
 import ni.jug.ncb.exchangerate.ExchangeRateFailsafeClient;
+import ni.jug.ncb.exchangerate.ExchangeRateScraper;
 import ni.jug.ncb.exchangerate.MonthlyExchangeRate;
 import ni.jug.util.Dates;
 
@@ -43,8 +44,25 @@ public class ExchangeRateCLI {
         help.append("Por ejemplo: -ym=[año]-[mes], -ym=[año1]-[mes1]:[año2]-[mes2], -ym=[año1]-[mes1],[año2]-[mes2],...\n");
     }
 
+    private boolean skipBcnWSCall() {
+        String skipOption = System.getProperty("skipBcnWS");
+
+        if (skipOption == null) {
+            return false;
+        }
+        if (skipOption.isEmpty()) {
+            return true;
+        }
+        return Boolean.parseBoolean(skipOption);
+    }
+
     private ExchangeRateBCNClient getClient() {
-        return new ExchangeRateFailsafeClient();
+        if (skipBcnWSCall()) {
+            LOGGER.info("Omitir consumo de servicio web de BCN");
+            return new ExchangeRateScraper();
+        } else {
+            return new ExchangeRateFailsafeClient();
+        }
     }
 
     private String messageForWrongDate(String strDate) {
