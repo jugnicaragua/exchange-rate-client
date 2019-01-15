@@ -1,4 +1,4 @@
-package ni.jug.ncb.exchangerate.cli;
+package ni.jug.exchangerate.cli;
 
 /**
  *
@@ -57,7 +57,7 @@ public final class CLIHelper {
         return EMPTY_STR;
     }
 
-    public static boolean optionIsPresent(String namedArgument, String[] args) {
+    public static boolean isOptionPresent(String namedArgument, String[] args) {
         doValidateNamedArgument(namedArgument);
 
         for (int i = 0; i < args.length; i++) {

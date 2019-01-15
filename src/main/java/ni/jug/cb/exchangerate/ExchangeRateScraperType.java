@@ -35,13 +35,13 @@ public enum ExchangeRateScraperType implements ExchangeRateScraper {
             if (buyText.isEmpty()) {
                 doThrowParsingError(content);
             }
-            BigDecimal buy = new BigDecimal(buyText);
+            BigDecimal buy = new BigDecimal(buyText).setScale(4);
 
             String sellText = Strings.substringBetween(content, OPEN_TAG, CLOSE_TAG, OPEN_TAG + buyText + CLOSE_TAG);
             if (sellText.isEmpty()) {
                 doThrowParsingError(content);
             }
-            BigDecimal sell = new BigDecimal(sellText);
+            BigDecimal sell = new BigDecimal(sellText).setScale(4);
 
             return new ExchangeRateTrade(bank(), buy, sell);
         }
@@ -51,7 +51,7 @@ public enum ExchangeRateScraperType implements ExchangeRateScraper {
             if (buyText.isEmpty()) {
                 doThrowParsingError(value);
             }
-            return new BigDecimal(buyText);
+            return new BigDecimal(buyText).setScale(4);
         }
 
         private BigDecimal convertSellValue(String value) {
@@ -59,7 +59,7 @@ public enum ExchangeRateScraperType implements ExchangeRateScraper {
             if (sellText.isEmpty()) {
                 doThrowParsingError(value);
             }
-            return new BigDecimal(sellText);
+            return new BigDecimal(sellText).setScale(4);
         }
 
         @Override
@@ -88,8 +88,8 @@ public enum ExchangeRateScraperType implements ExchangeRateScraper {
             Elements spans = selectExchangeRateElements(2);
 
             Iterator<Element> itr = spans.iterator();
-            BigDecimal buy = new BigDecimal(itr.next().text());
-            BigDecimal sell = new BigDecimal(itr.next().text());
+            BigDecimal buy = new BigDecimal(itr.next().text()).setScale(4);
+            BigDecimal sell = new BigDecimal(itr.next().text()).setScale(4);
 
             return new ExchangeRateTrade(bank(), buy, sell);
         }
@@ -118,13 +118,13 @@ public enum ExchangeRateScraperType implements ExchangeRateScraper {
             if (buyText.isEmpty()) {
                 doThrowParsingError(scriptContent);
             }
-            BigDecimal buy = new BigDecimal(buyText);
+            BigDecimal buy = new BigDecimal(buyText).setScale(4);
 
             String sellText = Strings.substringBetween(scriptContent, SELL_LITERAL, CLOSE_LITERAL, BUY_LITERAL + buyText + CLOSE_LITERAL);
             if (sellText.isEmpty()) {
                 doThrowParsingError(scriptContent);
             }
-            BigDecimal sell = new BigDecimal(sellText);
+            BigDecimal sell = new BigDecimal(sellText).setScale(4);
 
             return new ExchangeRateTrade(bank(), buy, sell);
         }
@@ -155,12 +155,12 @@ public enum ExchangeRateScraperType implements ExchangeRateScraper {
         public ExchangeRateTrade extractData() {
             Elements spans = selectExchangeRateElements(2);
             Iterator<Element> itr = spans.iterator();
-            BigDecimal buy = new BigDecimal(itr.next().text());
-            BigDecimal sell = new BigDecimal(itr.next().text());
+            BigDecimal buy = new BigDecimal(itr.next().text()).setScale(4);
+            BigDecimal sell = new BigDecimal(itr.next().text()).setScale(4);
             return new ExchangeRateTrade(bank(), buy, sell);
         }
     }, LAFISE("https://www.lafise.com/DesktopModules/Servicios/API/TasaCambio/VerPorPaisActivo") {
-        private static final String OFFSET_TEXT = "\"Id\":61656";
+        private static final String OFFSET_TEXT = "\"Descripcion\":\"Córdoba - Dolar\"";
         private static final String BUY_LITERAL = "\"ValorCompra\":\"NIO: ";
         private static final String SELL_LITERAL = "\"ValorVenta\":\"USD: ";
         private static final String CLOSE_LITERAL = "\",";
@@ -211,13 +211,13 @@ public enum ExchangeRateScraperType implements ExchangeRateScraper {
             if (buyText.isEmpty()) {
                 doThrowParsingError(content);
             }
-            BigDecimal buy = new BigDecimal(buyText);
+            BigDecimal buy = new BigDecimal(buyText).setScale(4);
 
             String sellText = Strings.substringBetween(content, SELL_LITERAL, CLOSE_LITERAL, BUY_LITERAL + buyText + CLOSE_LITERAL);
             if (sellText.isEmpty()) {
                 doThrowParsingError(content);
             }
-            BigDecimal sell = new BigDecimal(sellText);
+            BigDecimal sell = new BigDecimal(sellText).setScale(4);
 
             return new ExchangeRateTrade(bank(), buy, sell);
         }

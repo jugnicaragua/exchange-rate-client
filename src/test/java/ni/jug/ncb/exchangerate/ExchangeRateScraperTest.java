@@ -15,13 +15,13 @@ import org.junit.jupiter.api.Test;
  */
 public class ExchangeRateScraperTest {
 
-    private ExchangeRateClient getClient() {
+    private ExchangeRateBCNClient getClient() {
         return new ExchangeRateScraper();
     }
 
     @Test
     public void testExchangeRateAtSpecificDate() {
-        ExchangeRateClient client = getClient();
+        ExchangeRateBCNClient client = getClient();
 
         Assertions.assertEquals(new BigDecimal("31.9396"), client.getExchangeRate(LocalDate.of(2018, 10, 1)));
         Assertions.assertEquals(new BigDecimal("32.0679"), client.getExchangeRate(LocalDate.of(2018, 10, 31)));
@@ -29,7 +29,7 @@ public class ExchangeRateScraperTest {
 
     @Test
     public void testMonthlyExchangeRateAtSpecificDate() {
-        ExchangeRateClient client = getClient();
+        ExchangeRateBCNClient client = getClient();
         MonthlyExchangeRate monthlyExchangeRate = client.getMonthlyExchangeRate(2018, 10);
 
         Assertions.assertEquals(31, monthlyExchangeRate.size());
@@ -49,7 +49,7 @@ public class ExchangeRateScraperTest {
 
     @Test
     public void testValidationOfYear() {
-        ExchangeRateClient client = getClient();
+        ExchangeRateBCNClient client = getClient();
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             client.getExchangeRate(LocalDate.of(2011, 12, 31));

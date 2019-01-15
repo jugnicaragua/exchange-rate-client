@@ -12,12 +12,12 @@ import javax.xml.ws.WebServiceException;
  * @version 1.0
  * @since 2.0
  */
-public class ExchangeRateFailsafeClient implements ExchangeRateClient {
+public class ExchangeRateFailsafeClient implements ExchangeRateBCNClient {
 
     private static final Logger LOGGER = Logger.getLogger(ExchangeRateFailsafeClient.class.getName());
 
-    private final ExchangeRateClient wsClient;
-    private final ExchangeRateClient scraperClient;
+    private final ExchangeRateBCNClient wsClient;
+    private final ExchangeRateBCNClient scraperClient;
 
     public ExchangeRateFailsafeClient() {
         this.wsClient = new ExchangeRateWSClient();

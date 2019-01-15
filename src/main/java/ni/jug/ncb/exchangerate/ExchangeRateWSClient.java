@@ -14,7 +14,7 @@ import ni.jug.ncb.exchangerate.ws.TipoCambioBCNSoap;
  * @version 2.0
  * @since 1.0
  */
-public class ExchangeRateWSClient implements ExchangeRateClient {
+public class ExchangeRateWSClient implements ExchangeRateBCNClient {
 
     private TipoCambioBCNSoap getPort() {
         return new TipoCambioBCN().getTipoCambioBCNSoap();

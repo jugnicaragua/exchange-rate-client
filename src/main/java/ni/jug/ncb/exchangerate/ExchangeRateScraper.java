@@ -14,7 +14,7 @@ import org.jsoup.nodes.Document;
  * @version 1.0
  * @since 2.0
  */
-public class ExchangeRateScraper implements ExchangeRateClient {
+public class ExchangeRateScraper implements ExchangeRateBCNClient {
 
     private static final String URL_EXCHANGE_RATE = "https://www.bcn.gob.ni/estadisticas/mercados_cambiarios/tipo_cambio/" +
             "cordoba_dolar/mes.php?";

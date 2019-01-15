@@ -1,4 +1,4 @@
-package ni.jug.ncb.exchangerate.cli;
+package ni.jug.exchangerate.cli;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -6,10 +6,13 @@ import java.time.format.DateTimeParseException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import ni.jug.util.Dates;
-import ni.jug.ncb.exchangerate.ExchangeRateClient;
+import java.util.stream.Collectors;
+import ni.jug.cb.exchangerate.ExchangeRateCBClient;
+import ni.jug.cb.exchangerate.ExchangeRateTrade;
+import ni.jug.ncb.exchangerate.ExchangeRateBCNClient;
 import ni.jug.ncb.exchangerate.ExchangeRateFailsafeClient;
 import ni.jug.ncb.exchangerate.MonthlyExchangeRate;
+import ni.jug.util.Dates;
 
 /**
  *
@@ -24,9 +27,11 @@ public class ExchangeRateCLI {
     private static final String COMMA = ",";
     private static final String SPACE = " ";
     private static final String PROMPT = "--> ";
+    private static final String DASH_PROMPT = "------------------------------------------------------------------------\n";
 
     private static final String QUERY_BY_DATE = "-date";
     private static final String QUERY_BY_YEAR_MONTH = "-ym";
+    private static final String COMMERCIAL_BANK = "-bank";
     private static final String HELP = "--help";
 
     private static final StringBuilder help = new StringBuilder();
@@ -38,7 +43,7 @@ public class ExchangeRateCLI {
         help.append("Por ejemplo: -ym=[año]-[mes], -ym=[año1]-[mes1]:[año2]-[mes2], -ym=[año1]-[mes1],[año2]-[mes2],...\n");
     }
 
-    private ExchangeRateClient getClient() {
+    private ExchangeRateBCNClient getClient() {
         return new ExchangeRateFailsafeClient();
     }
 
@@ -59,7 +64,7 @@ public class ExchangeRateCLI {
 
     private void queryBySpecificDates(String value) {
         LOGGER.info("Obtener tasa de cambio por fecha");
-        ExchangeRateClient client = getClient();
+        ExchangeRateBCNClient client = getClient();
         BigDecimal exchangeRate;
 
         StringBuilder result = new StringBuilder(SPACE);
@@ -123,7 +128,7 @@ public class ExchangeRateCLI {
 
     private void queryBySpecificYearMonths(String value) {
         LOGGER.info("Obtener tasa de cambio por año-mes");
-        ExchangeRateClient client = getClient();
+        ExchangeRateBCNClient client = getClient();
         MonthlyExchangeRate monthlyExchangeRate;
 
         StringBuilder result = new StringBuilder(SPACE);
@@ -172,6 +177,38 @@ public class ExchangeRateCLI {
         }
     }
 
+    private void fetchExchangeRateFromCommercialBanks() {
+        ExchangeRateCBClient client = new ExchangeRateCBClient();
+        BigDecimal bcnExchangeRate = getClient().getCurrentExchangeRate();
+
+        StringBuilder result = new StringBuilder("\n");
+        result.append(DASH_PROMPT);
+        result.append("Bancos no disponibles: ");
+        result.append(client.unavailableBanks().stream().collect(Collectors.joining(", ")));
+        result.append("\n");
+        result.append(DASH_PROMPT);
+        result.append("\n");
+        result.append(DASH_PROMPT);
+        result.append(String.format("%-15s", "Banco"));
+        result.append(String.format("%12s", "Venta"));
+        result.append(String.format("%12s", "Compra"));
+        result.append(String.format("%12s", "Oficial"));
+        result.append("\n");
+        result.append(DASH_PROMPT);
+        for (ExchangeRateTrade trade : client.getTrades()) {
+            result.append(String.format("%-15s", trade.getBank()));
+            String sell = trade.getSell().toPlainString() + (trade.getSell().compareTo(client.bestSellPrice()) == 0 ? "*" : "");
+            result.append(String.format("%12s", sell));
+            String buy = trade.getBuy().toPlainString() + (trade.getBuy().compareTo(client.bestBuyPrice()) == 0 ? "*" : "");
+            result.append(String.format("%12s", buy));
+            result.append(String.format("%12s", bcnExchangeRate.toPlainString()));
+            result.append("\n");
+        }
+        result.append("\n* Mejor opcion");
+
+        LOGGER.info(result.toString());
+    }
+
     public void handleRequest(String[] args) {
         if (args.length == 0) {
             throw new IllegalArgumentException("No se especificaron argumentos");
@@ -187,8 +224,11 @@ public class ExchangeRateCLI {
         if (!queryByYearMonth.isEmpty()) {
             queryBySpecificYearMonths(queryByYearMonth);
         }
-        if (CLIHelper.optionIsPresent(HELP, args)) {
+        if (CLIHelper.isOptionPresent(HELP, args)) {
             printUsage();
+        }
+        if (CLIHelper.isOptionPresent(COMMERCIAL_BANK, args)) {
+            fetchExchangeRateFromCommercialBanks();
         }
     }
 
