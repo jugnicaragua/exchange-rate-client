@@ -1,4 +1,4 @@
-package ni.jug.exchangerate.cli;
+package ni.jug.cli;
 
 /**
  *

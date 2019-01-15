@@ -31,16 +31,12 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <!-- Project properties -->
-        <ncb.wsdl.url>https://servicios.bcn.gob.ni/Tc_Servicio/ServicioTC.asmx?WSDL</ncb.wsdl.url>
-
         <!-- Dependency versions -->
         <jsoup.version>1.11.3</jsoup.version>
         <junit.version>5.3.1</junit.version>
 
         <!-- Plugin versions -->
-        <main-class>ni.jug.exchangerate.cli.ExchangeRateCLI</main-class>
-        <jaxws-plugin.version>2.5</jaxws-plugin.version>
+        <main-class>ni.jug.cli.ExchangeRateCLI</main-class>
         <jar-plugin.version>3.1.0</jar-plugin.version>
         <dependency-plugin.version>3.1.1</dependency-plugin.version>
     </properties>
@@ -62,25 +58,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxws-maven-plugin</artifactId>
-                <version>${jaxws-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>wsimport</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <packageName>ni.jug.ncb.exchangerate.ws</packageName>
-                    <wsdlUrls>
-                        <wsdlUrl>${ncb.wsdl.url}</wsdlUrl>
-                    </wsdlUrls>
-                    <verbose>true</verbose>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
