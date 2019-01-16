@@ -18,7 +18,7 @@ import org.jsoup.select.Elements;
  * @version 1.0
  * @since 2.0
  */
-public class MonthlyExchangeRateHTMLDataReader implements MonthlyExchangeRateDataReader {
+class MonthlyExchangeRateHTMLDataReader implements MonthlyExchangeRateDataReader {
 
     private final Document exchangeRateDoc;
     private final int year;

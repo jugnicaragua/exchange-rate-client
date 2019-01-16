@@ -16,7 +16,7 @@ import org.jsoup.select.Elements;
  * @version 1.0
  * @since 1.0
  */
-public enum ExchangeRateScraperType implements ExchangeRateScraper {
+enum ExchangeRateScraperType implements ExchangeRateScraper {
 
     BANPRO("https://www.banprogrupopromerica.com.ni/umbraco/Surface/TipoCambio/Run?json={\"operacion\":2}") {
         private static final String OPEN_TAG = "\\u003cTD class=gris10px height=20 vAlign=middle width=75 align=center\\u003e";

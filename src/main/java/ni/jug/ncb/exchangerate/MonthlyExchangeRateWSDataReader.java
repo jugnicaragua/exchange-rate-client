@@ -17,7 +17,7 @@ import org.w3c.dom.Text;
  * @version 1.0
  * @since 2.0
  */
-public class MonthlyExchangeRateWSDataReader implements MonthlyExchangeRateDataReader {
+class MonthlyExchangeRateWSDataReader implements MonthlyExchangeRateDataReader {
 
     private final RecuperaTCMesResponse.RecuperaTCMesResult wsResponse;
 
