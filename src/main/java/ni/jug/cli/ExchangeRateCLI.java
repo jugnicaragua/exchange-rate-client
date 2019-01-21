@@ -42,6 +42,7 @@ public class ExchangeRateCLI {
         help.append("Por ejemplo: -date=[fecha], -date=[fecha1]:[fecha2], -date=[fecha1],[fecha2],...\n");
         help.append("  -ym: se puede consultar por año-mes. ");
         help.append("Por ejemplo: -ym=[año]-[mes], -ym=[año1]-[mes1]:[año2]-[mes2], -ym=[año1]-[mes1],[año2]-[mes2],...\n");
+        help.append("  -bank: muestra el detalle de la venta y compra del dolar en los bancos comerciales\n");
     }
 
     private boolean skipBcnWSCall() {
@@ -215,9 +216,9 @@ public class ExchangeRateCLI {
         result.append(DASH_PROMPT);
         for (ExchangeRateTrade trade : client.getTrades()) {
             result.append(String.format("%-15s", trade.getBank()));
-            String sell = trade.getSell().toPlainString() + (trade.getSell().compareTo(client.bestSellPrice()) == 0 ? "*" : "");
+            String sell = trade.getSell().toPlainString() + (trade.isSellEqual(client.bestSellPrice()) ? "*" : "");
             result.append(String.format("%12s", sell));
-            String buy = trade.getBuy().toPlainString() + (trade.getBuy().compareTo(client.bestBuyPrice()) == 0 ? "*" : "");
+            String buy = trade.getBuy().toPlainString() + (trade.isBuyEqual(client.bestBuyPrice()) ? "*" : "");
             result.append(String.format("%12s", buy));
             result.append(String.format("%12s", bcnExchangeRate.toPlainString()));
             result.append("\n");
