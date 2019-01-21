@@ -1,6 +1,8 @@
 package ni.jug.cb.exchangerate;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import ni.jug.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -20,8 +22,6 @@ interface ExchangeRateScraper {
 
     String url();
 
-    String cssSelector();
-
     ExchangeRateTrade extractData();
 
     default Document makeGetRequest() {
@@ -34,9 +34,9 @@ interface ExchangeRateScraper {
         }
     }
 
-    default Elements selectExchangeRateElements(int expectedMinimumSize) {
+    default Elements selectExchangeRateElements(int expectedMinimumSize, String cssSelector) {
         Document doc = makeGetRequest();
-        Elements elements = doc.select(cssSelector());
+        Elements elements = doc.select(cssSelector);
         if (elements.size() < expectedMinimumSize) {
             throw new IllegalArgumentException(String.format(ERROR_FOR_READING_HTML, bank()));
         }
@@ -45,14 +45,57 @@ interface ExchangeRateScraper {
 
     default String fetchAsPlainText() {
         try {
-            return Jsoup.connect(url()).validateTLSCertificates(false).ignoreContentType(true).execute().body();
+            return Jsoup.connect(url())
+                    .validateTLSCertificates(false)
+                    .ignoreContentType(true)
+                    .execute()
+                    .body();
         } catch (IOException ioe) {
             throw new IllegalArgumentException("No se pudo obtener el contenido del sitio web de [" + bank() + "]", ioe);
         }
     }
 
-    default void doThrowParsingError(String value) {
+    default ExchangeRateTrade extractDataFromContent(String content, String leftBuy, String rightBuy, String leftSell, String rightSell,
+            String offset) {
+        String buyText = Strings.substringBetween(content, leftBuy, rightBuy, offset);
+        if (buyText.isEmpty()) {
+            throwParsingError(content);
+        }
+        BigDecimal buy = new BigDecimal(buyText).setScale(4);
+
+        String sellText = Strings.substringBetween(content, leftSell, rightSell, leftBuy + buyText + rightBuy);
+        if (sellText.isEmpty()) {
+            throwParsingError(content);
+        }
+        BigDecimal sell = new BigDecimal(sellText).setScale(4);
+
+        return new ExchangeRateTrade(bank(), buy, sell);
+    }
+
+    default ExchangeRateTrade extractDataFromPlainTextResponse(String leftBuy, String rightBuy, String leftSell, String rightSell,
+            String offset) {
+        String response = fetchAsPlainText();
+        return extractDataFromContent(response, leftBuy, rightBuy, leftSell, rightSell, offset);
+    }
+
+    default ExchangeRateTrade extractDataFromPlainTextResponse(String open, String close) {
+        return extractDataFromPlainTextResponse(open, close, open, close, null);
+    }
+
+    default void throwParsingError(String value) {
         throw new IllegalArgumentException(String.format(ERROR_FOR_PARSING_TEXT, value));
+    }
+
+    default BigDecimal parseText(String value, String offset) {
+        String buyText = (offset == null || offset.isEmpty()) ? value : Strings.substringAfter(value, offset);
+        if (buyText.isEmpty()) {
+            throwParsingError(value);
+        }
+        return new BigDecimal(buyText).setScale(4);
+    }
+
+    default BigDecimal parseText(String value) {
+        return parseText(value, null);
     }
 
 }
