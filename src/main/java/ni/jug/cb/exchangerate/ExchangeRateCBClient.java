@@ -59,28 +59,28 @@ public class ExchangeRateCBClient {
                 .orElse(BigDecimal.ZERO);
 
         worstSellPrice = trades.stream()
-                .map(ExchangeRateTrade::getBuy)
+                .map(ExchangeRateTrade::getSell)
                 .max(Comparator.naturalOrder())
                 .orElse(BigDecimal.ZERO);
 
         // Lista de bancos con las mejores y peores opciones
         bestSellingOption = trades.stream()
-                .filter(trade -> trade.getSell().compareTo(bestSellPrice) == 0)
+                .filter(trade -> trade.isSellEqual(bestSellPrice))
                 .map(ExchangeRateTrade::getBank)
                 .collect(Collectors.toList());
 
         worstSellingOption = trades.stream()
-                .filter(trade -> trade.getSell().compareTo(worstSellPrice) == 0)
+                .filter(trade -> trade.isSellEqual(worstSellPrice))
                 .map(ExchangeRateTrade::getBank)
                 .collect(Collectors.toList());
 
         bestBuyingOption = trades.stream()
-                .filter(trade -> trade.getSell().compareTo(bestBuyPrice) == 0)
+                .filter(trade -> trade.isBuyEqual(bestBuyPrice))
                 .map(ExchangeRateTrade::getBank)
                 .collect(Collectors.toList());
 
         worstBuyingOption = trades.stream()
-                .filter(trade -> trade.getSell().compareTo(worstBuyPrice) == 0)
+                .filter(trade -> trade.isBuyEqual(worstBuyPrice))
                 .map(ExchangeRateTrade::getBank)
                 .collect(Collectors.toList());
     }

@@ -18,24 +18,14 @@ public final class ExchangeRateTrade {
     private final BigDecimal sell;
 
     public ExchangeRateTrade(String bank, LocalDate date, BigDecimal buy, BigDecimal sell) {
-        this.bank = bank;
-        this.date = date;
-        this.buy = buy;
-        this.sell = sell;
+        this.bank = Objects.requireNonNull(bank);
+        this.date = Objects.requireNonNull(date);
+        this.buy = Objects.requireNonNull(buy);
+        this.sell = Objects.requireNonNull(sell);
     }
 
     public ExchangeRateTrade(String bank, BigDecimal buy, BigDecimal sell) {
-        this.bank = bank;
-        this.buy = buy;
-        this.sell = sell;
-        this.date = LocalDate.now();
-    }
-
-    public ExchangeRateTrade(String bank) {
-        this.bank = bank;
-        this.buy = BigDecimal.ZERO;
-        this.sell = BigDecimal.ZERO;
-        this.date = LocalDate.now();
+        this(bank, LocalDate.now(), buy, sell);
     }
 
     public String getBank() {
@@ -52,6 +42,14 @@ public final class ExchangeRateTrade {
 
     public BigDecimal getSell() {
         return sell;
+    }
+
+    public boolean isSellEqual(BigDecimal sell) {
+        return this.sell.compareTo(sell) == 0;
+    }
+
+    public boolean isBuyEqual(BigDecimal buy) {
+        return this.buy.compareTo(buy) == 0;
     }
 
     public boolean isDataFetched() {
