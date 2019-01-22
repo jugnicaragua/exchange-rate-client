@@ -9,6 +9,11 @@ package ni.jug.util;
 public final class Strings {
 
     public static final String EMPTY = "";
+    public static final String COMMA = ",";
+    public static final String HYPHEN = "-";
+    public static final String DOUBLE_HYPHEN = "--";
+    public static final String COLON = ":";
+    public static final String EQUAL = "=";
 
     private Strings() {
     }
@@ -45,6 +50,33 @@ public final class Strings {
         if (offset == -1) {
             return EMPTY;
         }
-        return value.substring(offset + fromText.length());
+        offset += fromText.length();
+        if (offset >= value.length()) {
+            return EMPTY;
+        }
+        return value.substring(offset);
     }
+
+    public static boolean containsComma(String value) {
+        return value.contains(COMMA);
+    }
+
+    public static boolean containsColon(String value) {
+        return value.contains(COLON);
+    }
+
+    public static String[] splitCSV(String csv) {
+        return csv.split("\\,");
+    }
+
+    public static String[] splitCSVAndGetFirst2Elements(String value) {
+        String[] result = new String[2];
+        int pos = value.indexOf(COLON);
+        result[0] = value.substring(0, pos);
+        if (pos < value.length() - 1) {
+            result[1] = value.substring(pos + 1);
+        }
+        return result;
+    }
+
 }

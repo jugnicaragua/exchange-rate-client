@@ -234,8 +234,8 @@ public class ExchangeRateCLI {
         }
 
         // Extraer primero los valores para disparar validaciones
-        String queryByDate = CLIHelper.findOptionValueOf(QUERY_BY_DATE, args);
-        String queryByYearMonth = CLIHelper.findOptionValueOf(QUERY_BY_YEAR_MONTH, args);
+        String queryByDate = CLIHelper.searchValueOf(QUERY_BY_DATE, args);
+        String queryByYearMonth = CLIHelper.searchValueOf(QUERY_BY_YEAR_MONTH, args);
 
         if (!queryByDate.isEmpty()) {
             queryBySpecificDates(queryByDate);
@@ -243,10 +243,10 @@ public class ExchangeRateCLI {
         if (!queryByYearMonth.isEmpty()) {
             queryBySpecificYearMonths(queryByYearMonth);
         }
-        if (CLIHelper.isOptionPresent(HELP, args)) {
+        if (CLIHelper.containsOption(HELP, args)) {
             printUsage();
         }
-        if (CLIHelper.isOptionPresent(COMMERCIAL_BANK, args)) {
+        if (CLIHelper.containsOption(COMMERCIAL_BANK, args)) {
             fetchExchangeRateFromCommercialBanks();
         }
     }
