@@ -61,6 +61,8 @@ public final class ExchangeRateTrade {
         int hash = 7;
         hash = 31 * hash + Objects.hashCode(this.bank);
         hash = 31 * hash + Objects.hashCode(this.date);
+        hash = 31 * hash + Objects.hashCode(this.buy);
+        hash = 31 * hash + Objects.hashCode(this.sell);
         return hash;
     }
 
@@ -80,6 +82,12 @@ public final class ExchangeRateTrade {
             return false;
         }
         if (!Objects.equals(this.date, other.date)) {
+            return false;
+        }
+        if (!Objects.equals(this.buy, other.buy)) {
+            return false;
+        }
+        if (!Objects.equals(this.sell, other.sell)) {
             return false;
         }
         return true;
