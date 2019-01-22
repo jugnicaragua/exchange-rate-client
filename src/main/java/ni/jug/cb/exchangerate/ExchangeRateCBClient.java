@@ -25,10 +25,6 @@ public class ExchangeRateCBClient {
     private final BigDecimal worstBuyPrice;
     private final BigDecimal bestSellPrice;
     private final BigDecimal worstSellPrice;
-    private final List<String> bestSellingOption;
-    private final List<String> worstSellingOption;
-    private final List<String> bestBuyingOption;
-    private final List<String> worstBuyingOption;
 
     public ExchangeRateCBClient() {
         trades = startCrawling();
@@ -62,27 +58,6 @@ public class ExchangeRateCBClient {
                 .map(ExchangeRateTrade::getSell)
                 .max(Comparator.naturalOrder())
                 .orElse(BigDecimal.ZERO);
-
-        // Lista de bancos con las mejores y peores opciones
-        bestSellingOption = trades.stream()
-                .filter(trade -> trade.isSellEqual(bestSellPrice))
-                .map(ExchangeRateTrade::getBank)
-                .collect(Collectors.toList());
-
-        worstSellingOption = trades.stream()
-                .filter(trade -> trade.isSellEqual(worstSellPrice))
-                .map(ExchangeRateTrade::getBank)
-                .collect(Collectors.toList());
-
-        bestBuyingOption = trades.stream()
-                .filter(trade -> trade.isBuyEqual(bestBuyPrice))
-                .map(ExchangeRateTrade::getBank)
-                .collect(Collectors.toList());
-
-        worstBuyingOption = trades.stream()
-                .filter(trade -> trade.isBuyEqual(worstBuyPrice))
-                .map(ExchangeRateTrade::getBank)
-                .collect(Collectors.toList());
     }
 
     private List<ExchangeRateTrade> startCrawling() {
@@ -142,22 +117,6 @@ public class ExchangeRateCBClient {
 
     public BigDecimal worstBuyPrice() {
         return worstBuyPrice;
-    }
-
-    public List<String> bestSellingOption() {
-        return Collections.unmodifiableList(bestSellingOption);
-    }
-
-    public List<String> worstSellingOption() {
-        return Collections.unmodifiableList(worstSellingOption);
-    }
-
-    public List<String> bestBuyingOption() {
-        return Collections.unmodifiableList(bestBuyingOption);
-    }
-
-    public List<String> worstBuyingOption() {
-        return Collections.unmodifiableList(worstBuyingOption);
     }
 
     public List<String> unavailableBanks() {
