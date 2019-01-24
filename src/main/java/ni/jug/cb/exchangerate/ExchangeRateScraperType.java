@@ -74,12 +74,11 @@ enum ExchangeRateScraperType implements ExchangeRateScraper {
         @Override
         public Document makeGetRequest() {
             try {
-                return Jsoup.connect(url())
-                        .validateTLSCertificates(false)
-                        .userAgent(UA_FIREFOX_V64)
-                        .cookie("visid_incap_1796147", "m4r46cj3SVagBLl6ga4rWzCHNlwAAAAAQUIPAAAAAABJ/PEx6MFjfho367NgBxEl")
-                        .cookie("incap_ses_1062_1796147", "bUaaPR6p/0OPBKmxvPu8DjCHNlwAAAAAb1aUF2soRvHhaHMyM1hESQ==")
-                        .get();
+                Connection cnn = Jsoup.connect(url()).validateTLSCertificates(false).userAgent(UA_FIREFOX_V64);
+                if (BdfCookie.getInstance() != null) {
+                    cnn.cookies(BdfCookie.getInstance().cookies());
+                }
+                return cnn.get();
             } catch (IOException ioe) {
                 throw new IllegalArgumentException("No se pudo obtener el contenido del sitio web de [" + bank() + "]", ioe);
             }
@@ -155,6 +154,10 @@ enum ExchangeRateScraperType implements ExchangeRateScraper {
     @Override
     public String url() {
         return url;
+    }
+
+    public static int bankCount() {
+        return ExchangeRateScraperType.values().length;
     }
 
 }
