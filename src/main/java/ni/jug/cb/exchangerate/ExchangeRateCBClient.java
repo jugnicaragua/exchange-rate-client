@@ -15,7 +15,7 @@ import java.util.stream.Stream;
  * @since 1.0
  * @version 1.0
  */
-public class ExchangeRateCBClient {
+public final class ExchangeRateCBClient {
 
     private static final Logger LOGGER = Logger.getLogger(ExchangeRateCBClient.class.getName());
 
@@ -31,7 +31,7 @@ public class ExchangeRateCBClient {
 
         // Obtener los bancos de los cuales no se pudo obtener datos
         List<String> banks = trades.stream()
-                .map(ExchangeRateTrade::getBank)
+                .map(ExchangeRateTrade::bank)
                 .collect(Collectors.toList());
         unavailableBanks = Stream.of(ExchangeRateScraperType.values())
                 .filter(scraper -> !banks.contains(scraper.bank()))
@@ -40,22 +40,22 @@ public class ExchangeRateCBClient {
 
         // Obtener mejor y peor precio
         bestBuyPrice = trades.stream()
-                .map(ExchangeRateTrade::getBuy)
+                .map(ExchangeRateTrade::buy)
                 .max(Comparator.naturalOrder())
                 .orElse(BigDecimal.ZERO);
 
         worstBuyPrice = trades.stream()
-                .map(ExchangeRateTrade::getBuy)
+                .map(ExchangeRateTrade::buy)
                 .min(Comparator.naturalOrder())
                 .orElse(BigDecimal.ZERO);
 
         bestSellPrice = trades.stream()
-                .map(ExchangeRateTrade::getSell)
+                .map(ExchangeRateTrade::sell)
                 .min(Comparator.naturalOrder())
                 .orElse(BigDecimal.ZERO);
 
         worstSellPrice = trades.stream()
-                .map(ExchangeRateTrade::getSell)
+                .map(ExchangeRateTrade::sell)
                 .max(Comparator.naturalOrder())
                 .orElse(BigDecimal.ZERO);
     }
@@ -99,7 +99,7 @@ public class ExchangeRateCBClient {
         return Collections.emptyList();
     }
 
-    public List<ExchangeRateTrade> getTrades() {
+    public List<ExchangeRateTrade> trades() {
         return Collections.unmodifiableList(trades);
     }
 

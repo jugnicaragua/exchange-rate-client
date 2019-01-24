@@ -28,19 +28,19 @@ public final class ExchangeRateTrade {
         this(bank, LocalDate.now(), buy, sell);
     }
 
-    public String getBank() {
+    public String bank() {
         return bank;
     }
 
-    public LocalDate getDate() {
+    public LocalDate date() {
         return date;
     }
 
-    public BigDecimal getBuy() {
+    public BigDecimal buy() {
         return buy;
     }
 
-    public BigDecimal getSell() {
+    public BigDecimal sell() {
         return sell;
     }
 

@@ -214,11 +214,11 @@ public class ExchangeRateCLI {
         result.append(String.format("%12s", "Oficial"));
         result.append("\n");
         result.append(DASH_PROMPT);
-        for (ExchangeRateTrade trade : client.getTrades()) {
-            result.append(String.format("%-15s", trade.getBank()));
-            String sell = trade.getSell().toPlainString() + (trade.isSellEqual(client.bestSellPrice()) ? "*" : "");
+        for (ExchangeRateTrade trade : client.trades()) {
+            result.append(String.format("%-15s", trade.bank()));
+            String sell = trade.sell().toPlainString() + (trade.isSellEqual(client.bestSellPrice()) ? "*" : "");
             result.append(String.format("%12s", sell));
-            String buy = trade.getBuy().toPlainString() + (trade.isBuyEqual(client.bestBuyPrice()) ? "*" : "");
+            String buy = trade.buy().toPlainString() + (trade.isBuyEqual(client.bestBuyPrice()) ? "*" : "");
             result.append(String.format("%12s", buy));
             result.append(String.format("%12s", bcnExchangeRate.toPlainString()));
             result.append("\n");
