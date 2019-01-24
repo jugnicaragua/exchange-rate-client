@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,11 +31,11 @@ public final class ExchangeRateCBClient {
         trades = startCrawling();
 
         // Obtener los bancos de los cuales no se pudo obtener datos
-        List<String> banks = trades.stream()
+        List<String> fetchedBanks = trades.stream()
                 .map(ExchangeRateTrade::bank)
                 .collect(Collectors.toList());
         unavailableBanks = Stream.of(ExchangeRateScraperType.values())
-                .filter(scraper -> !banks.contains(scraper.bank()))
+                .filter(scraper -> !fetchedBanks.contains(scraper.bank()))
                 .map(ExchangeRateScraperType::bank)
                 .collect(Collectors.toList());
 
@@ -119,8 +120,29 @@ public final class ExchangeRateCBClient {
         return worstBuyPrice;
     }
 
+    public boolean repeatRequest() {
+        return unavailableBanks.size() > 0;
+    }
+
+    public int fetchedBankCount() {
+        return trades.size();
+    }
+
     public List<String> unavailableBanks() {
         return Collections.unmodifiableList(unavailableBanks);
+    }
+
+    public static ExchangeRateCBClient scrapAndRepeatIfNecessary() {
+        int count = 1;
+        ExchangeRateCBClient client = new ExchangeRateCBClient();
+
+        while (client.repeatRequest() && count++ <= 3) {
+            LOGGER.log(Level.INFO, "Repitiendo peticion. Solo se recuperaron datos de {0} bancos de un total de {1}",
+                    new Object[]{client.fetchedBankCount(), ExchangeRateScraperType.bankCount()});
+            client = new ExchangeRateCBClient();
+        }
+
+        return client;
     }
 
 }

@@ -197,7 +197,7 @@ public class ExchangeRateCLI {
     }
 
     private void fetchExchangeRateFromCommercialBanks() {
-        ExchangeRateCBClient client = new ExchangeRateCBClient();
+        ExchangeRateCBClient client = ExchangeRateCBClient.scrapAndRepeatIfNecessary();
         BigDecimal bcnExchangeRate = getClient().getCurrentExchangeRate();
 
         StringBuilder result = new StringBuilder("\n");
