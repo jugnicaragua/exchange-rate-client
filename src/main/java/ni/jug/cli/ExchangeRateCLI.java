@@ -46,7 +46,7 @@ public class ExchangeRateCLI {
     }
 
     private boolean skipBcnWSCall() {
-        String skipOption = System.getProperty("skipBcnWS");
+        String skipOption = System.getProperty("skipWs");
 
         if (skipOption == null) {
             return false;

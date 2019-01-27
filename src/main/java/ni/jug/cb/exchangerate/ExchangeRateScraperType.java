@@ -74,11 +74,11 @@ enum ExchangeRateScraperType implements ExchangeRateScraper {
         @Override
         public Document makeGetRequest() {
             try {
-                Connection cnn = Jsoup.connect(url()).validateTLSCertificates(false).userAgent(UA_FIREFOX_V64);
-                if (BdfCookie.getInstance() != null) {
-                    cnn.cookies(BdfCookie.getInstance().cookies());
-                }
-                return cnn.get();
+                return Jsoup.connect(url())
+                        .validateTLSCertificates(false)
+                        .userAgent(UA_FIREFOX_V64)
+                        .cookies(ExecutionContext.getInstance().bdfCookies())
+                        .get();
             } catch (IOException ioe) {
                 throw new IllegalArgumentException("No se pudo obtener el contenido del sitio web de [" + bank() + "]", ioe);
             }

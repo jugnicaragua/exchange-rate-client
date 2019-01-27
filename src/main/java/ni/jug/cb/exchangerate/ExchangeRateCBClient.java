@@ -120,7 +120,7 @@ public final class ExchangeRateCBClient {
         return worstBuyPrice;
     }
 
-    public boolean repeatRequest() {
+    boolean repeatRequest() {
         return unavailableBanks.size() > 0;
     }
 
