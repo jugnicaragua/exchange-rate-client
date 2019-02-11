@@ -87,11 +87,11 @@ interface ExchangeRateScraper {
     }
 
     default BigDecimal parseText(String value, String offset) {
-        String buyText = (offset == null || offset.isEmpty()) ? value : Strings.substringAfter(value, offset);
-        if (buyText.isEmpty()) {
+        String exchangeRateText = (offset == null || offset.isEmpty()) ? value : Strings.substringAfter(value, offset);
+        if (exchangeRateText.isEmpty()) {
             throwParsingError(value);
         }
-        return new BigDecimal(buyText).setScale(4);
+        return new BigDecimal(exchangeRateText).setScale(4);
     }
 
     default BigDecimal parseText(String value) {
