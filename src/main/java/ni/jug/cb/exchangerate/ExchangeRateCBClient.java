@@ -124,7 +124,7 @@ public final class ExchangeRateCBClient {
         return unavailableBanks.size() > 0;
     }
 
-    public int fetchedBankCount() {
+    public int fetchedBanksCount() {
         return trades.size();
     }
 
@@ -135,14 +135,18 @@ public final class ExchangeRateCBClient {
     public static ExchangeRateCBClient scrapAndRepeatIfNecessary() {
         int count = 1;
         ExchangeRateCBClient client = new ExchangeRateCBClient();
+        ExchangeRateCBClient bestAttempt = client;
 
         while (client.repeatRequest() && count++ <= 3) {
             LOGGER.log(Level.INFO, "Repitiendo peticion. Solo se recuperaron datos de {0} bancos de un total de {1}",
-                    new Object[]{client.fetchedBankCount(), ExchangeRateScraperType.bankCount()});
+                    new Object[]{client.fetchedBanksCount(), ExchangeRateScraperType.bankCount()});
             client = new ExchangeRateCBClient();
+            if (client.fetchedBanksCount() > bestAttempt.fetchedBanksCount()) {
+                bestAttempt = client;
+            }
         }
 
-        return client;
+        return bestAttempt;
     }
 
 }
