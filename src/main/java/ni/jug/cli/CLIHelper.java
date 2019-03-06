@@ -18,7 +18,7 @@ public final class CLIHelper {
     }
 
     private static boolean thereIsNoAssignment(String argument) {
-        return argument.indexOf(Strings.EQUAL) == -1;
+        return !argument.contains(Strings.EQUAL);
     }
 
     private static void doValidateNamedArgument(String namedArgument) {
@@ -99,10 +99,10 @@ public final class CLIHelper {
             Object[] result;
 
             if (Strings.containsComma(raw) || Strings.containsColon(raw)) {
-                String[] values = Strings.splitCSV(raw);
-                result = new Object[values.length];
-                for (int i = 0; i < values.length; i++) {
-                    String value = values[i];
+                String[] inlineValues = Strings.splitCSV(raw);
+                result = new Object[inlineValues.length];
+                for (int i = 0; i < inlineValues.length; i++) {
+                    String value = inlineValues[i];
                     if (Strings.containsColon(value)) {
                         result[i] = new OptionRangeValue(value);
                     } else {
