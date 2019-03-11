@@ -216,9 +216,9 @@ public class ExchangeRateCLI {
         result.append(DASH_PROMPT);
         for (ExchangeRateTrade trade : client.trades()) {
             result.append(String.format("%-15s", trade.bank()));
-            String sell = trade.sell().toPlainString() + (trade.isSellEqual(client.bestSellPrice()) ? "*" : "");
+            String sell = trade.sell().toPlainString() + (trade.isBestSellPrice() ? "*" : "");
             result.append(String.format("%12s", sell));
-            String buy = trade.buy().toPlainString() + (trade.isBuyEqual(client.bestBuyPrice()) ? "*" : "");
+            String buy = trade.buy().toPlainString() + (trade.isBestBuyPrice() ? "*" : "");
             result.append(String.format("%12s", buy));
             result.append(String.format("%12s", bcnExchangeRate.toPlainString()));
             result.append("\n");

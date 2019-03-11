@@ -28,10 +28,10 @@ public final class ExchangeRateCBClient {
     private final BigDecimal worstSellPrice;
 
     public ExchangeRateCBClient() {
-        trades = startCrawling();
+        List<ExchangeRateTrade> tempTrades = startCrawling();
 
         // Obtener los bancos de los cuales no se pudo obtener datos
-        List<String> fetchedBanks = trades.stream()
+        List<String> fetchedBanks = tempTrades.stream()
                 .map(ExchangeRateTrade::bank)
                 .collect(Collectors.toList());
         unavailableBanks = Stream.of(ExchangeRateScraperType.values())
@@ -40,25 +40,29 @@ public final class ExchangeRateCBClient {
                 .collect(Collectors.toList());
 
         // Obtener mejor y peor precio
-        bestBuyPrice = trades.stream()
+        bestBuyPrice = tempTrades.stream()
                 .map(ExchangeRateTrade::buy)
                 .max(Comparator.naturalOrder())
                 .orElse(BigDecimal.ZERO);
 
-        worstBuyPrice = trades.stream()
+        worstBuyPrice = tempTrades.stream()
                 .map(ExchangeRateTrade::buy)
                 .min(Comparator.naturalOrder())
                 .orElse(BigDecimal.ZERO);
 
-        bestSellPrice = trades.stream()
+        bestSellPrice = tempTrades.stream()
                 .map(ExchangeRateTrade::sell)
                 .min(Comparator.naturalOrder())
                 .orElse(BigDecimal.ZERO);
 
-        worstSellPrice = trades.stream()
+        worstSellPrice = tempTrades.stream()
                 .map(ExchangeRateTrade::sell)
                 .max(Comparator.naturalOrder())
                 .orElse(BigDecimal.ZERO);
+
+        trades = tempTrades.stream()
+                .map(trade -> trade.fromBestAndWorstPrices(bestBuyPrice, bestSellPrice, worstBuyPrice, worstSellPrice))
+                .collect(Collectors.toList());
     }
 
     private List<ExchangeRateTrade> startCrawling() {
