@@ -1,6 +1,5 @@
 package ni.jug.ncb.exchangerate;
 
-import ni.jug.util.Dates;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -8,6 +7,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
+import ni.jug.util.Dates;
 
 /**
  *
@@ -32,7 +32,7 @@ public class MonthlyExchangeRate {
             size = 0;
         } else {
             LocalDate _date = valuesByDate.keySet().iterator().next();
-            firstDate = LocalDate.of(_date.getYear(), _date.getMonth(), 1);
+            firstDate = _date.withDayOfMonth(1);
             lastDate = firstDate.plusMonths(1).minusDays(1);
             isIncomplete = valuesByDate.size() != ChronoUnit.DAYS.between(firstDate, lastDate.plusDays(1));
             size = valuesByDate.size();
