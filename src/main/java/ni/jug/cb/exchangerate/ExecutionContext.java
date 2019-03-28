@@ -2,6 +2,7 @@ package ni.jug.cb.exchangerate;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -17,19 +18,25 @@ public final class ExecutionContext {
 
     private final ConcurrentMap<String, String> bdfCookies;
 
-    public ExecutionContext() {
+    private ExecutionContext() {
         this.bdfCookies = new ConcurrentHashMap<>();
     }
 
-    public ExecutionContext addBdfCookie(Cookie cookie) {
-        bdfCookies.put(cookie.getName(), cookie.getValue());
+    public ExecutionContext addOrReplaceBdfCookie(Cookie cookie) {
+        Objects.requireNonNull(cookie);
+        String old = bdfCookies.get(cookie.getName());
+        if (old == null) {
+            bdfCookies.putIfAbsent(cookie.getName(), cookie.getValue());
+        } else {
+            bdfCookies.replace(cookie.getName(), old, cookie.getValue());
+        }
         return this;
     }
 
-    public ExecutionContext addBdfCookies(Cookie... cookies) {
+    public ExecutionContext addOrReplaceBdfCookies(Cookie... cookies) {
         if (!(cookies == null || cookies.length == 0)) {
-            for (Cookie cookie : cookies) {
-                bdfCookies.put(cookie.getName(), cookie.getValue());
+            for (int i = 0; i < cookies.length; i++) {
+                addOrReplaceBdfCookie(cookies[i]);
             }
         }
         return this;
