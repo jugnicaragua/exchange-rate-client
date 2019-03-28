@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -15,6 +17,8 @@ import org.jsoup.nodes.Document;
  * @since 2.0
  */
 public class ExchangeRateScraper implements ExchangeRateBCNClient {
+
+    private static final Logger LOGGER = Logger.getLogger(ExchangeRateScraper.class.getName());
 
     private static final String URL_EXCHANGE_RATE = "https://www.bcn.gob.ni/estadisticas/mercados_cambiarios/tipo_cambio/" +
             "cordoba_dolar/mes.php?";
@@ -43,7 +47,27 @@ public class ExchangeRateScraper implements ExchangeRateBCNClient {
     public MonthlyExchangeRate getMonthlyExchangeRate(int year, Month month) {
         Objects.requireNonNull(month);
         doValidateYear(year, month);
-        return new MonthlyExchangeRate(createHTMLReader(year, month));
+
+        MonthlyExchangeRate monthlyExchangeRate = null;
+        IllegalArgumentException error = null;
+        boolean fetched = false;
+        int count = 1;
+
+        do {
+            try {
+                LOGGER.log(Level.INFO, "Peticion [{0}]: Importar datos del sitio web del BCN", count);
+                monthlyExchangeRate = new MonthlyExchangeRate(createHTMLReader(year, month));
+                fetched = true;
+            } catch (IllegalArgumentException iae) {
+                error = iae;
+            }
+        } while (!fetched && ++count <= 3);
+
+        if (!fetched) {
+            throw error;
+        }
+
+        return monthlyExchangeRate;
     }
 
 }
