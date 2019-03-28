@@ -58,9 +58,10 @@ enum ExchangeRateScraperType implements ExchangeRateScraper {
 
         @Override
         public ExchangeRateTrade extractData() {
-            Elements scripts = selectExchangeRateElements(4, "script:not(script[type])");
+            Elements scripts = selectExchangeRateElements(5, "script:not(script[type])");
 
             Iterator<Element> itr = scripts.iterator();
+            itr.next();
             itr.next();
             itr.next();
             itr.next();
