@@ -142,7 +142,7 @@ public final class ExchangeRateCBClient {
         ExchangeRateCBClient bestAttempt = client;
 
         while (client.isUnavailableBanks() && count++ <= 3) {
-            LOGGER.log(Level.INFO, "Repitiendo peticion. Solo se recuperaron datos de {0} bancos de un total de {1}",
+            LOGGER.log(Level.INFO, "Repitiendo peticion. Solo se recuperaron datos de {0} de {1} bancos",
                     new Object[]{client.fetchedBanksCount(), ExchangeRateScraperType.bankCount()});
             client = new ExchangeRateCBClient();
             if (client.fetchedBanksCount() > bestAttempt.fetchedBanksCount()) {

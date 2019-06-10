@@ -2,6 +2,11 @@ package ni.jug.cli;
 
 import ni.jug.util.Strings;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
 /**
  *
  * @author Armando Alaniz
@@ -45,7 +50,7 @@ public final class CLIHelper {
         return Strings.EMPTY;
     }
 
-    public static boolean containsOption(String namedArgument, String[] args) {
+    public static boolean checkOption(String namedArgument, String[] args) {
         doValidateNamedArgument(namedArgument);
 
         for (int i = 0; i < args.length; i++) {
@@ -54,6 +59,28 @@ public final class CLIHelper {
             }
         }
         return false;
+    }
+
+    public static String getArgumentName(String argDeclaration) {
+        String namedArgument = argDeclaration;
+        if (namedArgument.contains("=")) {
+            namedArgument = namedArgument.substring(0, namedArgument.indexOf('='));
+        }
+        return namedArgument;
+    }
+
+    public static void validateOptions(String[] args, String... namedArguments) throws IllegalArgumentException {
+        Objects.requireNonNull(args);
+        Objects.requireNonNull(namedArguments);
+
+        List<String> namedArgumentToList = Arrays.asList(namedArguments);
+        for (int i = 0; i < args.length; i++) {
+            doValidateNamedArgument(args[i]);
+            String namedArgument = getArgumentName(args[i]);
+            if (!namedArgumentToList.contains(namedArgument)) {
+                throw new IllegalArgumentException("El argumento [" + namedArgument + "] es incorrecto. Revise la lista de parametros esperados");
+            }
+        }
     }
 
     public static class OptionRangeValue {

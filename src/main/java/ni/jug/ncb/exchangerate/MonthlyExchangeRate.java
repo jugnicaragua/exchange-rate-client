@@ -23,12 +23,12 @@ public class MonthlyExchangeRate {
     private final boolean isIncomplete;
     private final int size;
 
-    public MonthlyExchangeRate(MonthlyExchangeRateDataReader monthlyData) {
-        valuesByDate = monthlyData.processResult();
+    public MonthlyExchangeRate(Map<LocalDate, BigDecimal> exchangeRates) {
+        valuesByDate = exchangeRates;
         if (valuesByDate.isEmpty()) {
             firstDate = null;
             lastDate = null;
-            isIncomplete = false;
+            isIncomplete = true;
             size = 0;
         } else {
             LocalDate _date = valuesByDate.keySet().iterator().next();
@@ -94,6 +94,10 @@ public class MonthlyExchangeRate {
     @Override
     public String toString() {
         return "MonthlyExchangeRate{" + valuesByDate + '}';
+    }
+
+    public static MonthlyExchangeRate create(ExchangeRateHTMLDataReader monthlyData) {
+        return new MonthlyExchangeRate(monthlyData.processResult());
     }
 
 }

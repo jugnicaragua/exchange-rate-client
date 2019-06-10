@@ -18,24 +18,23 @@ import org.jsoup.select.Elements;
  * @version 1.0
  * @since 2.0
  */
-class MonthlyExchangeRateHTMLDataReader implements MonthlyExchangeRateDataReader {
+class ExchangeRateHTMLDataReader {
 
     private final Document exchangeRateDoc;
     private final int year;
     private final Month month;
 
-    public MonthlyExchangeRateHTMLDataReader(Document exchangeRateDoc, int year, Month month) {
+    public ExchangeRateHTMLDataReader(Document exchangeRateDoc, int year, Month month) {
         this.exchangeRateDoc = exchangeRateDoc;
         this.year = year;
         this.month = month;
     }
 
-    @Override
     public Map<LocalDate, BigDecimal> processResult() {
         Elements divs = exchangeRateDoc.select("tbody div[align]");
 
         if (divs.isEmpty() || divs.size() <= 2) {
-            return Collections.emptyMap();
+            throw new IllegalArgumentException("No se pudo obtener el dato, el dom de la pagina web del BCN ha cambiado");
         }
 
         Iterator<Element> itr = divs.iterator();

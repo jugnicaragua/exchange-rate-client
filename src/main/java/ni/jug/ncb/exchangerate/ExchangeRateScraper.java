@@ -16,7 +16,7 @@ import org.jsoup.nodes.Document;
  * @version 1.0
  * @since 2.0
  */
-public class ExchangeRateScraper implements ExchangeRateBCNClient {
+public class ExchangeRateScraper implements ExchangeRateNCBClient {
 
     private static final Logger LOGGER = Logger.getLogger(ExchangeRateScraper.class.getName());
 
@@ -28,10 +28,10 @@ public class ExchangeRateScraper implements ExchangeRateBCNClient {
         return new StringBuilder(URL_EXCHANGE_RATE).append(String.format(QUERY_STRING, month, year)).toString();
     }
 
-    private static MonthlyExchangeRateHTMLDataReader createHTMLReader(int year, Month month) {
+    private static ExchangeRateHTMLDataReader createHTMLReader(int year, Month month) {
         try {
             Document doc = Jsoup.connect(buildURL(year, month.getValue())).validateTLSCertificates(false).get();
-            return new MonthlyExchangeRateHTMLDataReader(doc, year, month);
+            return new ExchangeRateHTMLDataReader(doc, year, month);
         } catch (IOException ioe) {
             throw new IllegalArgumentException("No se pudieron extraer los datos del sitio web del BCN", ioe);
         }
@@ -56,7 +56,7 @@ public class ExchangeRateScraper implements ExchangeRateBCNClient {
         do {
             try {
                 LOGGER.log(Level.INFO, "Peticion [{0}]: Importar datos del sitio web del BCN", count);
-                monthlyExchangeRate = new MonthlyExchangeRate(createHTMLReader(year, month));
+                monthlyExchangeRate = MonthlyExchangeRate.create(createHTMLReader(year, month));
                 fetched = true;
             } catch (IllegalArgumentException iae) {
                 error = iae;

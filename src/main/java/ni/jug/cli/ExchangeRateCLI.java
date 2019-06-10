@@ -9,8 +9,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import ni.jug.cb.exchangerate.ExchangeRateCBClient;
 import ni.jug.cb.exchangerate.ExchangeRateTrade;
-import ni.jug.ncb.exchangerate.ExchangeRateBCNClient;
-import ni.jug.ncb.exchangerate.ExchangeRateFailsafeClient;
+import ni.jug.ncb.exchangerate.ExchangeRateNCBClient;
 import ni.jug.ncb.exchangerate.ExchangeRateScraper;
 import ni.jug.ncb.exchangerate.MonthlyExchangeRate;
 import ni.jug.util.Dates;
@@ -30,10 +29,10 @@ public class ExchangeRateCLI {
     private static final String PROMPT = "--> ";
     private static final String DASH_PROMPT = "------------------------------------------------------------------------\n";
 
-    private static final String QUERY_BY_DATE = "-date";
-    private static final String QUERY_BY_YEAR_MONTH = "-ym";
-    private static final String COMMERCIAL_BANK = "-bank";
-    private static final String HELP = "--help";
+    private static final String OPT_QUERY_BY_DATE = "-date";
+    private static final String OPT_QUERY_BY_YEAR_MONTH = "-ym";
+    private static final String OPT_COMMERCIAL_BANK = "-bank";
+    private static final String OPT_HELP = "--help";
 
     private static final StringBuilder help = new StringBuilder();
     static {
@@ -45,25 +44,8 @@ public class ExchangeRateCLI {
         help.append("  -bank: muestra el detalle de la venta y compra del dolar en los bancos comerciales\n");
     }
 
-    private boolean skipBcnWSCall() {
-        String skipOption = System.getProperty("skipWs");
-
-        if (skipOption == null) {
-            return false;
-        }
-        if (skipOption.isEmpty()) {
-            return true;
-        }
-        return Boolean.parseBoolean(skipOption);
-    }
-
-    private ExchangeRateBCNClient getClient() {
-        if (skipBcnWSCall()) {
-            LOGGER.info("Omitir consumo de servicio web de BCN");
-            return new ExchangeRateScraper();
-        } else {
-            return new ExchangeRateFailsafeClient();
-        }
+    private ExchangeRateNCBClient getNCBClient() {
+        return new ExchangeRateScraper();
     }
 
     private String messageForWrongDate(String strDate) {
@@ -83,7 +65,7 @@ public class ExchangeRateCLI {
 
     private void queryBySpecificDates(String value) {
         LOGGER.info("Obtener tasa de cambio por fecha");
-        ExchangeRateBCNClient client = getClient();
+        ExchangeRateNCBClient client = getNCBClient();
         BigDecimal exchangeRate;
 
         StringBuilder result = new StringBuilder(SPACE);
@@ -147,7 +129,7 @@ public class ExchangeRateCLI {
 
     private void queryBySpecificYearMonths(String value) {
         LOGGER.info("Obtener tasa de cambio por año-mes");
-        ExchangeRateBCNClient client = getClient();
+        ExchangeRateNCBClient client = getNCBClient();
         MonthlyExchangeRate monthlyExchangeRate;
 
         StringBuilder result = new StringBuilder(SPACE);
@@ -198,7 +180,7 @@ public class ExchangeRateCLI {
 
     private void fetchExchangeRateFromCommercialBanks() {
         ExchangeRateCBClient client = ExchangeRateCBClient.scrapAndRepeatIfNecessary();
-        BigDecimal bcnExchangeRate = getClient().getCurrentExchangeRate();
+        BigDecimal bcnExchangeRate = getNCBClient().getCurrentExchangeRate();
 
         StringBuilder result = new StringBuilder("\n");
         result.append(DASH_PROMPT);
@@ -230,12 +212,13 @@ public class ExchangeRateCLI {
 
     public void handleRequest(String[] args) {
         if (args.length == 0) {
-            throw new IllegalArgumentException("No se especificaron argumentos");
+            throw new IllegalArgumentException("Especificar al menos un argumento. Para mayor informacion, ejecutar --help");
         }
+        CLIHelper.validateOptions(args, OPT_QUERY_BY_DATE, OPT_QUERY_BY_YEAR_MONTH, OPT_COMMERCIAL_BANK, OPT_HELP);
 
         // Extraer primero los valores para disparar validaciones
-        String queryByDate = CLIHelper.searchValueOf(QUERY_BY_DATE, args);
-        String queryByYearMonth = CLIHelper.searchValueOf(QUERY_BY_YEAR_MONTH, args);
+        String queryByDate = CLIHelper.searchValueOf(OPT_QUERY_BY_DATE, args);
+        String queryByYearMonth = CLIHelper.searchValueOf(OPT_QUERY_BY_YEAR_MONTH, args);
 
         if (!queryByDate.isEmpty()) {
             queryBySpecificDates(queryByDate);
@@ -243,10 +226,10 @@ public class ExchangeRateCLI {
         if (!queryByYearMonth.isEmpty()) {
             queryBySpecificYearMonths(queryByYearMonth);
         }
-        if (CLIHelper.containsOption(HELP, args)) {
+        if (CLIHelper.checkOption(OPT_HELP, args)) {
             printUsage();
         }
-        if (CLIHelper.containsOption(COMMERCIAL_BANK, args)) {
+        if (CLIHelper.checkOption(OPT_COMMERCIAL_BANK, args)) {
             fetchExchangeRateFromCommercialBanks();
         }
     }
