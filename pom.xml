@@ -7,7 +7,7 @@
     <packaging>jar</packaging>
     <description>Libreria para obtener los datos de intercambio del córdoba con respecto al dólar</description>
 
-    <url>https://github.com/jug-ni/ncb-exchange-rate-client</url>
+    <url>https://github.com/jugnicaragua/exchange-rate-client</url>
     <organization>
         <name>Java Nicaragua</name>
         <url>http://javanicaragua.org/</url>
