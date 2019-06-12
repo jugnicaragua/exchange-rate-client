@@ -1,4 +1,4 @@
-package ni.jug.cb.exchangerate;
+package ni.jug.exchangerate.cb;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -15,7 +15,7 @@ import org.jsoup.select.Elements;
  * @version 1.0
  * @since 1.0
  */
-enum ExchangeRateScraperType implements ExchangeRateScraper {
+enum CommercialBankExchangeRateScraperType implements CommercialBankExchangeRateScraper {
 
     BANPRO("https://www.banprogrupopromerica.com.ni/umbraco/Surface/TipoCambio/Run?json={\"operacion\":2}") {
         private static final String OPEN_TAG = "\\u003cTD class=gris10px height=20 vAlign=middle width=75 align=center\\u003e";
@@ -142,9 +142,11 @@ enum ExchangeRateScraperType implements ExchangeRateScraper {
 
     };
 
+    static final int bankCount = CommercialBankExchangeRateScraperType.values().length;
+
     private final String url;
 
-    private ExchangeRateScraperType(String url) {
+    CommercialBankExchangeRateScraperType(String url) {
         this.url = url;
     }
 
@@ -159,7 +161,7 @@ enum ExchangeRateScraperType implements ExchangeRateScraper {
     }
 
     public static int bankCount() {
-        return ExchangeRateScraperType.values().length;
+        return bankCount;
     }
 
 }

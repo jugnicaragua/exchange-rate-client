@@ -1,4 +1,4 @@
-package ni.jug.ncb.exchangerate;
+package ni.jug.exchangerate.ncb;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -10,7 +10,7 @@ import java.time.Month;
  * @version 2.0
  * @since 1.0
  */
-public interface ExchangeRateNCBClient {
+public interface NiCentralBankExchangeRateClient {
 
     int MINIMUM_YEAR = 2012;
 

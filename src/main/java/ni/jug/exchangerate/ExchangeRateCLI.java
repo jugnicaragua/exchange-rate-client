@@ -1,4 +1,4 @@
-package ni.jug.cli;
+package ni.jug.exchangerate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -7,11 +7,13 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import ni.jug.cb.exchangerate.ExchangeRateCBClient;
-import ni.jug.cb.exchangerate.ExchangeRateTrade;
-import ni.jug.ncb.exchangerate.ExchangeRateNCBClient;
-import ni.jug.ncb.exchangerate.ExchangeRateScraper;
-import ni.jug.ncb.exchangerate.MonthlyExchangeRate;
+
+import ni.jug.cli.CLIHelper;
+import ni.jug.exchangerate.cb.CommercialBankExchangeRate;
+import ni.jug.exchangerate.cb.ExchangeRateTrade;
+import ni.jug.exchangerate.ncb.NiCentralBankExchangeRateClient;
+import ni.jug.exchangerate.ncb.NiCentralBankExchangeRateScraper;
+import ni.jug.exchangerate.ncb.MonthlyExchangeRate;
 import ni.jug.util.Dates;
 
 /**
@@ -44,8 +46,8 @@ public class ExchangeRateCLI {
         help.append("  -bank: muestra el detalle de la venta y compra del dolar en los bancos comerciales\n");
     }
 
-    private ExchangeRateNCBClient getNCBClient() {
-        return new ExchangeRateScraper();
+    private ExchangeRateClient getExchangeRateClient() {
+        return new ExchangeRateClient();
     }
 
     private String messageForWrongDate(String strDate) {
@@ -65,7 +67,7 @@ public class ExchangeRateCLI {
 
     private void queryBySpecificDates(String value) {
         LOGGER.info("Obtener tasa de cambio por fecha");
-        ExchangeRateNCBClient client = getNCBClient();
+        ExchangeRateClient client = getExchangeRateClient();
         BigDecimal exchangeRate;
 
         StringBuilder result = new StringBuilder(SPACE);
@@ -78,7 +80,7 @@ public class ExchangeRateCLI {
 
                 try {
                     LocalDate date = Dates.toLocalDate(strDate);
-                    exchangeRate = client.getExchangeRate(date);
+                    exchangeRate = client.getNiCentralBankExchangeRate(date);
 
                     doAppendExchangeRateByDate(date, exchangeRate, result);
                 } catch (DateTimeParseException dtpe) {
@@ -94,7 +96,7 @@ public class ExchangeRateCLI {
                     Dates.validateDate1IsBeforeDate2(date1, date2);
 
                     while (date1.compareTo(date2) <= 0) {
-                        exchangeRate = client.getExchangeRate(date1);
+                        exchangeRate = client.getNiCentralBankExchangeRate(date1);
                         doAppendExchangeRateByDate(date1, exchangeRate, result);
                         date1 = date1.plusDays(1);
                     }
@@ -129,7 +131,7 @@ public class ExchangeRateCLI {
 
     private void queryBySpecificYearMonths(String value) {
         LOGGER.info("Obtener tasa de cambio por año-mes");
-        ExchangeRateNCBClient client = getNCBClient();
+        ExchangeRateClient client = getExchangeRateClient();
         MonthlyExchangeRate monthlyExchangeRate;
 
         StringBuilder result = new StringBuilder(SPACE);
@@ -142,7 +144,7 @@ public class ExchangeRateCLI {
 
                 try {
                     LocalDate date = Dates.toFirstDateOfYearMonth(yearMonth);
-                    monthlyExchangeRate = client.getMonthlyExchangeRate(date);
+                    monthlyExchangeRate = client.getNiCentralBankMonthlyExchangeRate(date);
 
                     doAppendMonthlyExchangeRate(monthlyExchangeRate, result);
                 } catch (DateTimeParseException dtpe) {
@@ -159,7 +161,7 @@ public class ExchangeRateCLI {
                     Dates.validateDate1IsBeforeDate2(date1, date2);
 
                     while (date1.compareTo(date2) <= 0) {
-                        monthlyExchangeRate = client.getMonthlyExchangeRate(date1);
+                        monthlyExchangeRate = client.getNiCentralBankMonthlyExchangeRate(date1);
                         doAppendMonthlyExchangeRate(monthlyExchangeRate, result);
                         date1 = date1.plusMonths(1);
                     }
@@ -179,13 +181,13 @@ public class ExchangeRateCLI {
     }
 
     private void fetchExchangeRateFromCommercialBanks() {
-        ExchangeRateCBClient client = ExchangeRateCBClient.scrapAndRepeatIfNecessary();
-        BigDecimal bcnExchangeRate = getNCBClient().getCurrentExchangeRate();
+        CommercialBankExchangeRate commercialBankExchangeRate = getExchangeRateClient().commercialBankExchangeRate();
+        BigDecimal officialExchangeRate = getExchangeRateClient().getNiCentralBankCurrentExchangeRate();
 
         StringBuilder result = new StringBuilder("\n");
         result.append(DASH_PROMPT);
         result.append("Bancos no disponibles: ");
-        result.append(client.unavailableBanks().stream().collect(Collectors.joining(", ")));
+        result.append(commercialBankExchangeRate.unavailableBanks().stream().collect(Collectors.joining(", ")));
         result.append("\n");
         result.append(DASH_PROMPT);
         result.append("\n");
@@ -196,13 +198,13 @@ public class ExchangeRateCLI {
         result.append(String.format("%12s", "Oficial"));
         result.append("\n");
         result.append(DASH_PROMPT);
-        for (ExchangeRateTrade trade : client.trades()) {
+        for (ExchangeRateTrade trade : commercialBankExchangeRate.trades()) {
             result.append(String.format("%-15s", trade.bank()));
             String sell = trade.sell().toPlainString() + (trade.isBestSellPrice() ? "*" : "");
             result.append(String.format("%12s", sell));
             String buy = trade.buy().toPlainString() + (trade.isBestBuyPrice() ? "*" : "");
             result.append(String.format("%12s", buy));
-            result.append(String.format("%12s", bcnExchangeRate.toPlainString()));
+            result.append(String.format("%12s", officialExchangeRate.toPlainString()));
             result.append("\n");
         }
         result.append("\n* Mejor opcion");
@@ -212,7 +214,7 @@ public class ExchangeRateCLI {
 
     public void handleRequest(String[] args) {
         if (args.length == 0) {
-            throw new IllegalArgumentException("Especificar al menos un argumento. Para mayor informacion, ejecutar --help");
+            throw new IllegalArgumentException("Se requiere al menos un argumento");
         }
         CLIHelper.validateOptions(args, OPT_QUERY_BY_DATE, OPT_QUERY_BY_YEAR_MONTH, OPT_COMMERCIAL_BANK, OPT_HELP);
 

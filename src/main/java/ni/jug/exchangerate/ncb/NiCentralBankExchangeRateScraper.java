@@ -1,4 +1,4 @@
-package ni.jug.ncb.exchangerate;
+package ni.jug.exchangerate.ncb;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -16,9 +16,9 @@ import org.jsoup.nodes.Document;
  * @version 1.0
  * @since 2.0
  */
-public class ExchangeRateScraper implements ExchangeRateNCBClient {
+public class NiCentralBankExchangeRateScraper implements NiCentralBankExchangeRateClient {
 
-    private static final Logger LOGGER = Logger.getLogger(ExchangeRateScraper.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(NiCentralBankExchangeRateScraper.class.getName());
 
     private static final String URL_EXCHANGE_RATE = "https://www.bcn.gob.ni/estadisticas/mercados_cambiarios/tipo_cambio/" +
             "cordoba_dolar/mes.php?";

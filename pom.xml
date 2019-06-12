@@ -36,7 +36,7 @@
         <junit.version>5.3.1</junit.version>
 
         <!-- Plugin versions -->
-        <main-class>ni.jug.cli.ExchangeRateCLI</main-class>
+        <main-class>ni.jug.exchangerate.ExchangeRateCLI</main-class>
         <jar-plugin.version>3.1.0</jar-plugin.version>
         <dependency-plugin.version>3.1.1</dependency-plugin.version>
     </properties>

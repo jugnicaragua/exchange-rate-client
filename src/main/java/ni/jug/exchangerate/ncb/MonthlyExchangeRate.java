@@ -1,4 +1,4 @@
-package ni.jug.ncb.exchangerate;
+package ni.jug.exchangerate.ncb;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

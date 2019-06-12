@@ -1,36 +1,35 @@
 package ni.jug.ncb.exchangerate;
 
+import ni.jug.exchangerate.ExchangeRateClient;
+import ni.jug.exchangerate.ncb.MonthlyExchangeRate;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Map;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 /**
  *
  * @author Armando Alaniz
- * @version 1.0
+ * @version 2.0
  * @since 2.0
  */
-public class ExchangeRateScraperTest {
-
-    private ExchangeRateNCBClient getClient() {
-        return new ExchangeRateScraper();
-    }
+public class ExchangeRateTest {
 
     @Test
     public void testExchangeRateAtSpecificDate() {
-        ExchangeRateNCBClient client = getClient();
+        ExchangeRateClient client = new ExchangeRateClient();
 
-        Assertions.assertEquals(new BigDecimal("31.9396"), client.getExchangeRate(LocalDate.of(2018, 10, 1)));
-        Assertions.assertEquals(new BigDecimal("32.0679"), client.getExchangeRate(LocalDate.of(2018, 10, 31)));
+        Assertions.assertEquals(new BigDecimal("31.9396"), client.getNiCentralBankExchangeRate(LocalDate.of(2018, 10, 1)));
+        Assertions.assertEquals(new BigDecimal("32.0679"), client.getNiCentralBankExchangeRate(LocalDate.of(2018, 10, 31)));
     }
 
     @Test
     public void testMonthlyExchangeRateAtSpecificDate() {
-        ExchangeRateNCBClient client = getClient();
-        MonthlyExchangeRate monthlyExchangeRate = client.getMonthlyExchangeRate(2018, 10);
+        ExchangeRateClient client = new ExchangeRateClient();
+        MonthlyExchangeRate monthlyExchangeRate = client.getNiCentralBankMonthlyExchangeRate(2018, 10);
 
         Assertions.assertEquals(31, monthlyExchangeRate.size());
         Assertions.assertEquals(new BigDecimal("31.9396"), monthlyExchangeRate.getFirstExchangeRate());
@@ -49,19 +48,19 @@ public class ExchangeRateScraperTest {
 
     @Test
     public void testValidationOfYear() {
-        ExchangeRateNCBClient client = getClient();
+        ExchangeRateClient client = new ExchangeRateClient();
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            client.getExchangeRate(LocalDate.of(2011, 12, 31));
+            client.getNiCentralBankExchangeRate(LocalDate.of(2011, 12, 31));
         });
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            client.getMonthlyExchangeRate(2011, Month.DECEMBER);
+            client.getNiCentralBankMonthlyExchangeRate(2011, Month.DECEMBER);
         });
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            client.getMonthlyExchangeRate(2011, 10);
+            client.getNiCentralBankMonthlyExchangeRate(2011, 10);
         });
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            client.getMonthlyExchangeRate(LocalDate.of(2011, 12, 1));
+            client.getNiCentralBankMonthlyExchangeRate(LocalDate.of(2011, 12, 1));
         });
     }
 

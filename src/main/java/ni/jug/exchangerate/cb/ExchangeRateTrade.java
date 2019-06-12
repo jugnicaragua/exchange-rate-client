@@ -1,4 +1,4 @@
-package ni.jug.cb.exchangerate;
+package ni.jug.exchangerate.cb;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -69,7 +69,7 @@ public final class ExchangeRateTrade {
         return worstSellPrice;
     }
 
-    public ExchangeRateTrade fromBestAndWorstPrices(BigDecimal bestBuyPrice,
+    public ExchangeRateTrade usingPrices(BigDecimal bestBuyPrice,
             BigDecimal bestSellPrice, BigDecimal worstBuyPrice, BigDecimal worstSellPrice) {
         return new ExchangeRateTrade(bank, date, buy, sell, bestBuyPrice, bestSellPrice, worstBuyPrice, worstSellPrice);
     }

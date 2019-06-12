@@ -1,4 +1,4 @@
-package ni.jug.cb.exchangerate;
+package ni.jug.exchangerate.cb;
 
 import java.util.Collections;
 import java.util.Map;
