@@ -24,7 +24,7 @@ public class MonthlyExchangeRate {
     private final int size;
 
     public MonthlyExchangeRate(Map<LocalDate, BigDecimal> exchangeRates) {
-        valuesByDate = exchangeRates;
+        valuesByDate = Objects.requireNonNull(exchangeRates);
         if (valuesByDate.isEmpty()) {
             firstDate = null;
             lastDate = null;
@@ -94,10 +94,6 @@ public class MonthlyExchangeRate {
     @Override
     public String toString() {
         return "MonthlyExchangeRate{" + valuesByDate + '}';
-    }
-
-    public static MonthlyExchangeRate create(ExchangeRateHTMLDataReader monthlyData) {
-        return new MonthlyExchangeRate(monthlyData.processResult());
     }
 
 }
