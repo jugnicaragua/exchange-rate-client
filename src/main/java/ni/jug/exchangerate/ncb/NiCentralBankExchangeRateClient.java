@@ -48,7 +48,7 @@ public interface NiCentralBankExchangeRateClient {
         return getMonthlyExchangeRate(date.getYear(), date.getMonth());
     }
 
-    default MonthlyExchangeRate getCurrentMonthExchangeRate() {
+    default MonthlyExchangeRate getCurrentMonthlyExchangeRate() {
         return getMonthlyExchangeRate(LocalDate.now());
     }
 

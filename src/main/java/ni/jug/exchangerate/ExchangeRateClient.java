@@ -14,7 +14,7 @@ import java.util.List;
 /**
  *
  * @author Armando Alaniz
- * @version 1.0
+ * @version 2.0
  * @since 2.0
  */
 public final class ExchangeRateClient {
@@ -25,28 +25,28 @@ public final class ExchangeRateClient {
         this.niCentralBankExchangeRateClient = new NiCentralBankExchangeRateScraper();
     }
 
-    public BigDecimal getNiCentralBankExchangeRate(LocalDate date) {
+    public BigDecimal getOfficialExchangeRate(LocalDate date) {
         return niCentralBankExchangeRateClient.getExchangeRate(date);
     }
 
-    public BigDecimal getNiCentralBankCurrentExchangeRate() {
+    public BigDecimal getOfficialCurrentExchangeRate() {
         return niCentralBankExchangeRateClient.getCurrentExchangeRate();
     }
 
-    public MonthlyExchangeRate getNiCentralBankMonthlyExchangeRate(int year, Month month) {
+    public MonthlyExchangeRate getOfficialMonthlyExchangeRate(int year, Month month) {
         return niCentralBankExchangeRateClient.getMonthlyExchangeRate(year, month);
     }
 
-    public MonthlyExchangeRate getNiCentralBankMonthlyExchangeRate(int year, int month) {
+    public MonthlyExchangeRate getOfficialMonthlyExchangeRate(int year, int month) {
         return niCentralBankExchangeRateClient.getMonthlyExchangeRate(year, month);
     }
 
-    public MonthlyExchangeRate getNiCentralBankMonthlyExchangeRate(LocalDate date) {
+    public MonthlyExchangeRate getOfficialMonthlyExchangeRate(LocalDate date) {
         return niCentralBankExchangeRateClient.getMonthlyExchangeRate(date);
     }
 
-    public MonthlyExchangeRate getNiCentralBankCurrentMonthExchangeRate() {
-        return niCentralBankExchangeRateClient.getCurrentMonthExchangeRate();
+    public MonthlyExchangeRate getOfficialCurrentMonthlyExchangeRate() {
+        return niCentralBankExchangeRateClient.getCurrentMonthlyExchangeRate();
     }
 
     public CommercialBankExchangeRate commercialBankExchangeRate() {

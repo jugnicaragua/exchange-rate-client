@@ -22,14 +22,14 @@ public class ExchangeRateTest {
     public void testExchangeRateAtSpecificDate() {
         ExchangeRateClient client = new ExchangeRateClient();
 
-        Assertions.assertEquals(new BigDecimal("31.9396"), client.getNiCentralBankExchangeRate(LocalDate.of(2018, 10, 1)));
-        Assertions.assertEquals(new BigDecimal("32.0679"), client.getNiCentralBankExchangeRate(LocalDate.of(2018, 10, 31)));
+        Assertions.assertEquals(new BigDecimal("31.9396"), client.getOfficialExchangeRate(LocalDate.of(2018, 10, 1)));
+        Assertions.assertEquals(new BigDecimal("32.0679"), client.getOfficialExchangeRate(LocalDate.of(2018, 10, 31)));
     }
 
     @Test
     public void testMonthlyExchangeRateAtSpecificDate() {
         ExchangeRateClient client = new ExchangeRateClient();
-        MonthlyExchangeRate monthlyExchangeRate = client.getNiCentralBankMonthlyExchangeRate(2018, 10);
+        MonthlyExchangeRate monthlyExchangeRate = client.getOfficialMonthlyExchangeRate(2018, 10);
 
         Assertions.assertEquals(31, monthlyExchangeRate.size());
         Assertions.assertEquals(new BigDecimal("31.9396"), monthlyExchangeRate.getFirstExchangeRate());
@@ -51,16 +51,16 @@ public class ExchangeRateTest {
         ExchangeRateClient client = new ExchangeRateClient();
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            client.getNiCentralBankExchangeRate(LocalDate.of(2011, 12, 31));
+            client.getOfficialExchangeRate(LocalDate.of(2011, 12, 31));
         });
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            client.getNiCentralBankMonthlyExchangeRate(2011, Month.DECEMBER);
+            client.getOfficialMonthlyExchangeRate(2011, Month.DECEMBER);
         });
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            client.getNiCentralBankMonthlyExchangeRate(2011, 10);
+            client.getOfficialMonthlyExchangeRate(2011, 10);
         });
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            client.getNiCentralBankMonthlyExchangeRate(LocalDate.of(2011, 12, 1));
+            client.getOfficialMonthlyExchangeRate(LocalDate.of(2011, 12, 1));
         });
     }
 
