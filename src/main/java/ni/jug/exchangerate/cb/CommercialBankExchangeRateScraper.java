@@ -13,12 +13,14 @@ import org.jsoup.select.Elements;
  * @version 1.0
  * @since 1.0
  */
-interface CommercialBankExchangeRateScraper {
+public interface CommercialBankExchangeRateScraper {
 
     String ERROR_FOR_PARSING_TEXT = "No se pudo extraer el dato de [%s]";
     String ERROR_FOR_READING_HTML = "No se pudo extraer el dato, el HTML del sitio web de [%s] ha sido modificado";
 
     String bank();
+
+    String description();
 
     String url();
 

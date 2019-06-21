@@ -15,9 +15,9 @@ import org.jsoup.select.Elements;
  * @version 1.0
  * @since 1.0
  */
-enum CommercialBankExchangeRateScraperType implements CommercialBankExchangeRateScraper {
+public enum CommercialBankExchangeRateScraperType implements CommercialBankExchangeRateScraper {
 
-    BANPRO("https://www.banprogrupopromerica.com.ni/umbraco/Surface/TipoCambio/Run?json={\"operacion\":2}") {
+    BANPRO("Banco de la Produccion", "https://www.banprogrupopromerica.com.ni/umbraco/Surface/TipoCambio/Run?json={\"operacion\":2}") {
         private static final String OPEN_TAG = "\\u003cTD class=gris10px height=20 vAlign=middle width=75 align=center\\u003e";
         private static final String CLOSE_TAG = "\\u003c/TD\\u003e";
 
@@ -50,7 +50,7 @@ enum CommercialBankExchangeRateScraperType implements CommercialBankExchangeRate
             return new ExchangeRateTrade(bank(), buy, sell);
         }
 
-    }, BAC("https://www.sucursalelectronica.com/redir/showLogin.go") {
+    }, BAC("Banco de America Central", "https://www.sucursalelectronica.com/redir/showLogin.go") {
         private static final String NIC_BLOCK_LITERAL = "countryCode : 'NI',";
         private static final String BUY_LITERAL = "buy : '";
         private static final String SELL_LITERAL = "sell : '";
@@ -70,7 +70,7 @@ enum CommercialBankExchangeRateScraperType implements CommercialBankExchangeRate
             return extractDataFromContent(script.html(), BUY_LITERAL, CLOSE_LITERAL, SELL_LITERAL, CLOSE_LITERAL, NIC_BLOCK_LITERAL);
         }
 
-    }, BDF("https://www.bdfnet.com/") {
+    }, BDF("Banco de Finanzas", "https://www.bdfnet.com/") {
         private static final String UA_FIREFOX_V64 = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:64.0) Gecko/20100101 Firefox/64.0";
 
         @Override
@@ -96,7 +96,7 @@ enum CommercialBankExchangeRateScraperType implements CommercialBankExchangeRate
             return new ExchangeRateTrade(bank(), buy, sell);
         }
 
-    }, LAFISE("https://www.lafise.com/DesktopModules/Servicios/API/TasaCambio/VerPorPaisActivo") {
+    }, LAFISE("Latin American Financial Services", "https://www.lafise.com/DesktopModules/Servicios/API/TasaCambio/VerPorPaisActivo") {
         private static final String OFFSET_TEXT = "\"Descripcion\":\"Córdoba - Dolar\"";
         private static final String BUY_LITERAL = "\"ValorCompra\":\"NIO: ";
         private static final String SELL_LITERAL = "\"ValorVenta\":\"USD: ";
@@ -144,15 +144,27 @@ enum CommercialBankExchangeRateScraperType implements CommercialBankExchangeRate
 
     static final int bankCount = CommercialBankExchangeRateScraperType.values().length;
 
+    private final String description;
     private final String url;
 
+    CommercialBankExchangeRateScraperType(String description, String url) {
+        this.description = description;
+        this.url = url;
+    }
+
     CommercialBankExchangeRateScraperType(String url) {
+        this.description = name();
         this.url = url;
     }
 
     @Override
     public String bank() {
         return name();
+    }
+
+    @Override
+    public String description() {
+        return description;
     }
 
     @Override
