@@ -3,6 +3,7 @@ package ni.jug.exchangerate.cb;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.logging.Level;
@@ -16,7 +17,7 @@ import java.util.stream.Stream;
  * @version 2.0
  * @since 1.0
  */
-public final class CommercialBankExchangeRate {
+public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTrade> {
 
     private static final Logger LOGGER = Logger.getLogger(CommercialBankExchangeRate.class.getName());
 
@@ -93,6 +94,11 @@ public final class CommercialBankExchangeRate {
 
     public List<String> unavailableBanks() {
         return Collections.unmodifiableList(unavailableBanks);
+    }
+
+    @Override
+    public Iterator<ExchangeRateTrade> iterator() {
+        return trades.iterator();
     }
 
     private static List<ExchangeRateTrade> startCrawling() {

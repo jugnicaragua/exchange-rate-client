@@ -74,7 +74,7 @@ Código de ejemplo para obtener las tasas de los bancos comerciales:
 
         CommercialBankExchangeRate commercialBankExchangeRate = new ExchangeRateClient().commercialBankExchangeRate();
         StringBuilder result = new StringBuilder("\n");
-        for (ExchangeRateTrade trade : commercialBankExchangeRate.trades()) {
+        for (ExchangeRateTrade trade : commercialBankExchangeRate) {
             result.append(String.format("%-15s", trade.bank()));
             String sell = trade.sell().toPlainString() + (trade.isBestSellPrice() ? "*" : "");
             result.append(String.format("%12s", sell));
@@ -88,14 +88,7 @@ Referirse a los [test unitarios][test unitario] para más ejemplos.
 
 ## Uso del CLI (Línea de comandos o Terminal)
 
-Para ejecutar el cli se requiere tener instalado maven y java con las versiones indicadas en el apartado `Stack`. Cuando se construya el proyecto se debe incluir la propiedad de sistema `-Dcli` para activar el perfil del cli. Lo anterior hara que se cree un archivo `MANIFEST.MF` con la configuracion del classpath y la clase principal (sin este archivo no es posible ejecutar el cli).
-
-Opciones disponibles:
-
-- date: una fecha, un rango o una lista. La fecha debe ser ingresada en formato ISO: yyyy-MM-dd.
-- ym: un año-mes, un rango o una lista. La fecha debe ser ingresada en formato ISO: yyyy-MM.
-- bank: compra/venta de los bancos comerciales
-- help: Muestra las opciones disponibles y ejemplos de uso.
+Para ejecutar el cli se requiere tener instalado `maven` y `java` con las versiones indicadas en el apartado `Stack`. Cuando se construya el proyecto se debe incluir la propiedad de sistema `-Dcli` para activar el perfil del cli. Lo anterior hara que se cree un archivo `MANIFEST.MF` con la configuracion del classpath y la clase principal (sin este archivo no es posible ejecutar el cli).
 
 Pasos para instalar la librería:
 
@@ -107,6 +100,13 @@ Pasos para instalar la librería:
         # Ejecutar la aplicación. Referirse a los ejemplos anteriores para mayor información
         cd target/
         java -jar exchange-rate-client-1.0-SNAPSHOT.jar -date=2018-10-23
+
+Opciones disponibles:
+
+- date: una fecha, un rango o una lista. La fecha debe ser ingresada en formato ISO: yyyy-MM-dd.
+- ym: un año-mes, un rango o una lista. La fecha debe ser ingresada en formato ISO: yyyy-MM.
+- bank: compra/venta de los bancos comerciales
+- help: Muestra las opciones disponibles y ejemplos de uso.
 
 Ejemplos de ejecución del cli:
 

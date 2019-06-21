@@ -117,7 +117,7 @@ public class ExchangeRateCLI {
         if (sb.length() > 0) {
             sb.append("\n");
         }
-        for (Map.Entry<LocalDate, BigDecimal> exchangeRateByDate : monthlyExchangeRate.getMonthlyExchangeRate().entrySet()) {
+        for (Map.Entry<LocalDate, BigDecimal> exchangeRateByDate : monthlyExchangeRate) {
             sb.append(PROMPT);
             sb.append(exchangeRateByDate.getKey());
             sb.append(COMMA);
@@ -196,7 +196,7 @@ public class ExchangeRateCLI {
         result.append(String.format("%12s", "Oficial"));
         result.append("\n");
         result.append(DASH_PROMPT);
-        for (ExchangeRateTrade trade : commercialBankExchangeRate.trades()) {
+        for (ExchangeRateTrade trade : commercialBankExchangeRate) {
             result.append(String.format("%-15s", trade.bank()));
             String sell = trade.sell().toPlainString() + (trade.isBestSellPrice() ? "*" : "");
             result.append(String.format("%12s", sell));

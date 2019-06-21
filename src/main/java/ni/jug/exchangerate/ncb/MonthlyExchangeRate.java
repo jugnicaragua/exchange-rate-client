@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
@@ -15,12 +16,12 @@ import ni.jug.util.Dates;
  * @version 2.0
  * @since 1.0
  */
-public class MonthlyExchangeRate {
+public class MonthlyExchangeRate implements Iterable<Map.Entry<LocalDate, BigDecimal>> {
 
     private final Map<LocalDate, BigDecimal> valuesByDate;
     private final LocalDate firstDate;
     private final LocalDate lastDate;
-    private final boolean isIncomplete;
+    private final boolean incomplete;
     private final int size;
 
     public MonthlyExchangeRate(Map<LocalDate, BigDecimal> exchangeRates) {
@@ -28,13 +29,13 @@ public class MonthlyExchangeRate {
         if (valuesByDate.isEmpty()) {
             firstDate = null;
             lastDate = null;
-            isIncomplete = true;
+            incomplete = true;
             size = 0;
         } else {
             LocalDate _date = valuesByDate.keySet().iterator().next();
             firstDate = _date.withDayOfMonth(1);
             lastDate = firstDate.plusMonths(1).minusDays(1);
-            isIncomplete = valuesByDate.size() != ChronoUnit.DAYS.between(firstDate, lastDate.plusDays(1));
+            incomplete = valuesByDate.size() != ChronoUnit.DAYS.between(firstDate, lastDate.plusDays(1));
             size = valuesByDate.size();
         }
     }
@@ -80,7 +81,7 @@ public class MonthlyExchangeRate {
     }
 
     public boolean isIncomplete() {
-        return isIncomplete;
+        return incomplete;
     }
 
     public int size() {
@@ -89,6 +90,11 @@ public class MonthlyExchangeRate {
 
     public boolean isEmpty() {
         return size == 0;
+    }
+
+    @Override
+    public Iterator<Map.Entry<LocalDate, BigDecimal>> iterator() {
+        return valuesByDate.entrySet().iterator();
     }
 
     @Override
