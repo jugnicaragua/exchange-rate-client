@@ -3,6 +3,8 @@ package ni.jug.exchangerate.ncb;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Year;
+import java.time.YearMonth;
 
 /**
  *
@@ -14,8 +16,8 @@ public interface NiCentralBankExchangeRateClient {
 
     int MINIMUM_YEAR = 2012;
 
-    default void doValidateYear(int year, Month month) {
-        doValidateYear(LocalDate.of(year, month, 1));
+    default void doValidateYear(YearMonth yearMonth) {
+        doValidateYear(LocalDate.of(yearMonth.getYear(), yearMonth.getMonthValue(), 1));
     }
 
     default void doValidateYear(LocalDate date) {
@@ -38,14 +40,10 @@ public interface NiCentralBankExchangeRateClient {
         return getExchangeRate(LocalDate.now());
     }
 
-    MonthlyExchangeRate getMonthlyExchangeRate(int year, Month month);
-
-    default MonthlyExchangeRate getMonthlyExchangeRate(int year, int month) {
-        return getMonthlyExchangeRate(year, Month.of(month));
-    }
+    MonthlyExchangeRate getMonthlyExchangeRate(YearMonth yearMonth);
 
     default MonthlyExchangeRate getMonthlyExchangeRate(LocalDate date) {
-        return getMonthlyExchangeRate(date.getYear(), date.getMonth());
+        return getMonthlyExchangeRate(YearMonth.from(date));
     }
 
     default MonthlyExchangeRate getCurrentMonthlyExchangeRate() {

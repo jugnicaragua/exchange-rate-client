@@ -9,6 +9,7 @@ import ni.jug.exchangerate.ncb.NiCentralBankExchangeRateScraper;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.YearMonth;
 import java.util.List;
 
 /**
@@ -33,12 +34,8 @@ public final class ExchangeRateClient {
         return niCentralBankExchangeRateClient.getCurrentExchangeRate();
     }
 
-    public MonthlyExchangeRate getOfficialMonthlyExchangeRate(int year, Month month) {
-        return niCentralBankExchangeRateClient.getMonthlyExchangeRate(year, month);
-    }
-
-    public MonthlyExchangeRate getOfficialMonthlyExchangeRate(int year, int month) {
-        return niCentralBankExchangeRateClient.getMonthlyExchangeRate(year, month);
+    public MonthlyExchangeRate getOfficialMonthlyExchangeRate(YearMonth yearMonth) {
+        return niCentralBankExchangeRateClient.getMonthlyExchangeRate(yearMonth);
     }
 
     public MonthlyExchangeRate getOfficialMonthlyExchangeRate(LocalDate date) {

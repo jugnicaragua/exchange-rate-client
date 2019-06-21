@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.YearMonth;
 import java.util.Map;
 
 /**
@@ -29,7 +30,7 @@ public class ExchangeRateTest {
     @Test
     public void testMonthlyExchangeRateAtSpecificDate() {
         ExchangeRateClient client = new ExchangeRateClient();
-        MonthlyExchangeRate monthlyExchangeRate = client.getOfficialMonthlyExchangeRate(2018, 10);
+        MonthlyExchangeRate monthlyExchangeRate = client.getOfficialMonthlyExchangeRate(YearMonth.of(2018, 10));
 
         Assertions.assertEquals(31, monthlyExchangeRate.size());
         Assertions.assertEquals(new BigDecimal("31.9396"), monthlyExchangeRate.getFirstExchangeRate());
@@ -54,10 +55,10 @@ public class ExchangeRateTest {
             client.getOfficialExchangeRate(LocalDate.of(2011, 12, 31));
         });
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            client.getOfficialMonthlyExchangeRate(2011, Month.DECEMBER);
+            client.getOfficialMonthlyExchangeRate(YearMonth.of(2011, Month.DECEMBER));
         });
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            client.getOfficialMonthlyExchangeRate(2011, 10);
+            client.getOfficialMonthlyExchangeRate(YearMonth.of(2011, 10));
         });
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             client.getOfficialMonthlyExchangeRate(LocalDate.of(2011, 12, 1));

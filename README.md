@@ -52,10 +52,9 @@ Código de ejemplo para obtener el tipo de cambio oficial del BCN:
         Assertions.assertEquals(new BigDecimal("31.9396"), client.getOfficialExchangeRate(LocalDate.of(2018, 10, 1)));
         Assertions.assertEquals(new BigDecimal("32.0679"), client.getOfficialExchangeRate(LocalDate.of(2018, 10, 31)));
 
-
         // Consultar por periodo
-        ExchangeRateClient client = new ExchangeRateClient();
-        MonthlyExchangeRate monthlyExchangeRate = client.getOfficialMonthlyExchangeRate(2018, 10);
+         ExchangeRateClient client = new ExchangeRateClient();
+        MonthlyExchangeRate monthlyExchangeRate = client.getOfficialMonthlyExchangeRate(YearMonth.of(2018, 10));
 
         Assertions.assertEquals(31, monthlyExchangeRate.size());
         Assertions.assertEquals(new BigDecimal("31.9396"), monthlyExchangeRate.getFirstExchangeRate());

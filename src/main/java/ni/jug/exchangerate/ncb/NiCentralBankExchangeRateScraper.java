@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.Map;
@@ -30,13 +31,14 @@ public class NiCentralBankExchangeRateScraper implements NiCentralBankExchangeRa
             "cordoba_dolar/mes.php?";
     private static final String QUERY_STRING = "mes=%02d&anio=%d";
 
-    private static String buildURL(int year, int month) {
-        return new StringBuilder(URL_EXCHANGE_RATE).append(String.format(QUERY_STRING, month, year)).toString();
+    private static String buildURL(YearMonth yearMonth) {
+        return new StringBuilder(URL_EXCHANGE_RATE).append(String.format(QUERY_STRING, yearMonth.getMonthValue(),
+                yearMonth.getYear())).toString();
     }
 
-    private static Map<LocalDate, BigDecimal> scrapExchangeRateInfo(int year, Month month) {
+    private static Map<LocalDate, BigDecimal> scrapExchangeRateInfo(YearMonth yearMonth) {
         try {
-            Document doc = Jsoup.connect(buildURL(year, month.getValue())).validateTLSCertificates(false).get();
+            Document doc = Jsoup.connect(buildURL(yearMonth)).validateTLSCertificates(false).get();
             Elements divs = doc.select("tbody div[align]");
 
             if (divs.isEmpty() || divs.size() <= 2) {
@@ -51,12 +53,11 @@ public class NiCentralBankExchangeRateScraper implements NiCentralBankExchangeRa
             Map<LocalDate, BigDecimal> valuesByDate = new TreeMap<>();
             LocalDate date = null;
             BigDecimal value = null;
-            String yearAndMonth = year + "-" + String.format("%02d", month.getValue()) + "-";
             while (itr.hasNext()) {
                 String text = itr.next().text();
 
                 if (text.contains("-")) {
-                    date = LocalDate.parse(yearAndMonth + text.substring(0, 2), DateTimeFormatter.ISO_DATE);
+                    date = LocalDate.of(yearMonth.getYear(), yearMonth.getMonthValue(), Integer.parseInt(text.substring(0, 2)));
                 } else {
                     value = new BigDecimal(text);
                 }
@@ -81,9 +82,9 @@ public class NiCentralBankExchangeRateScraper implements NiCentralBankExchangeRa
     }
 
     @Override
-    public MonthlyExchangeRate getMonthlyExchangeRate(int year, Month month) {
-        Objects.requireNonNull(month);
-        doValidateYear(year, month);
+    public MonthlyExchangeRate getMonthlyExchangeRate(YearMonth yearMonth) {
+        Objects.requireNonNull(yearMonth);
+        doValidateYear(yearMonth);
 
         MonthlyExchangeRate monthlyExchangeRate = null;
         IllegalArgumentException error = null;
@@ -93,7 +94,7 @@ public class NiCentralBankExchangeRateScraper implements NiCentralBankExchangeRa
         do {
             try {
                 LOGGER.log(Level.INFO, "Peticion [{0}]: Importar datos del sitio web del BCN", count);
-                monthlyExchangeRate = new MonthlyExchangeRate(scrapExchangeRateInfo(year, month));
+                monthlyExchangeRate = new MonthlyExchangeRate(scrapExchangeRateInfo(yearMonth));
                 fetched = true;
             } catch (IllegalArgumentException iae) {
                 error = iae;
