@@ -30,6 +30,7 @@ public interface CommercialBankExchangeRateScraper {
         try {
             return Jsoup.connect(url())
                     .validateTLSCertificates(false)
+                    .cookies(ExecutionContext.getInstance().cookies(bank()))
                     .get();
         } catch (IOException ioe) {
             throw new IllegalArgumentException("No se pudo obtener el contenido del sitio web de [" + bank() + "]", ioe);
@@ -49,6 +50,7 @@ public interface CommercialBankExchangeRateScraper {
         try {
             return Jsoup.connect(url())
                     .validateTLSCertificates(false)
+                    .cookies(ExecutionContext.getInstance().cookies(bank()))
                     .ignoreContentType(true)
                     .execute()
                     .body();

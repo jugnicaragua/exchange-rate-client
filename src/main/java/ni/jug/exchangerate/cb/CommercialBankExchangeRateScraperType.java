@@ -78,8 +78,8 @@ public enum CommercialBankExchangeRateScraperType implements CommercialBankExcha
             try {
                 return Jsoup.connect(url())
                         .validateTLSCertificates(false)
+                        .cookies(ExecutionContext.getInstance().cookies(bank()))
                         .userAgent(UA_FIREFOX_V64)
-                        .cookies(ExecutionContext.getInstance().bdfCookies())
                         .get();
             } catch (IOException ioe) {
                 throw new IllegalArgumentException("No se pudo obtener el contenido del sitio web de [" + bank() + "]", ioe);

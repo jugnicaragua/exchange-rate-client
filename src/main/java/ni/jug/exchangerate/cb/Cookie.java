@@ -27,6 +27,24 @@ public final class Cookie {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Cookie)) {
+            return false;
+        }
+        Cookie cookie = (Cookie) o;
+        return name.equals(cookie.name) &&
+                value.equals(cookie.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, value);
+    }
+
+    @Override
     public String toString() {
         return "Cookie{" + name + "=" + value + '}';
     }
