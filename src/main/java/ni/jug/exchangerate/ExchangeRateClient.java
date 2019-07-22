@@ -1,6 +1,8 @@
 package ni.jug.exchangerate;
 
+import ni.jug.exchangerate.cb.CommercialBank;
 import ni.jug.exchangerate.cb.CommercialBankExchangeRate;
+import ni.jug.exchangerate.cb.CommercialBankExchangeRateScraperType;
 import ni.jug.exchangerate.cb.ExchangeRateTrade;
 import ni.jug.exchangerate.ncb.MonthlyExchangeRate;
 import ni.jug.exchangerate.ncb.NiCentralBankExchangeRateClient;
@@ -14,7 +16,7 @@ import java.util.List;
 /**
  *
  * @author Armando Alaniz
- * @version 2.0
+ * @version 3.0
  * @since 2.0
  */
 public final class ExchangeRateClient {
@@ -51,6 +53,10 @@ public final class ExchangeRateClient {
 
     public List<ExchangeRateTrade> commercialBanktrades() {
         return CommercialBankExchangeRate.create().trades();
+    }
+
+    public static List<CommercialBank> commercialBanks() {
+        return CommercialBankExchangeRateScraperType.commercialBanks();
     }
 
 }

@@ -2,7 +2,10 @@ package ni.jug.exchangerate.cb;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,7 +15,7 @@ import org.jsoup.select.Elements;
 /**
  *
  * @author Armando Alaniz
- * @version 1.0
+ * @version 2.0
  * @since 1.0
  */
 public enum CommercialBankExchangeRateScraperType implements CommercialBankExchangeRateScraper {
@@ -105,7 +108,7 @@ public enum CommercialBankExchangeRateScraperType implements CommercialBankExcha
         private final String payload;
         {
             StringBuilder data = new StringBuilder();
-            data.append("{");
+            data.append('{');
             data.append("\"Activo\": true,");
             data.append("\"Descripcion\": \"\",");
             data.append("\"IdPais\": -1,");
@@ -114,7 +117,7 @@ public enum CommercialBankExchangeRateScraperType implements CommercialBankExcha
             data.append("\"SimboloVenta\": \"\",");
             data.append("\"ValorCompra\": \"\",");
             data.append("\"ValorVenta\": \"\"");
-            data.append("}");
+            data.append('}');
             payload = data.toString();
         }
 
@@ -124,6 +127,7 @@ public enum CommercialBankExchangeRateScraperType implements CommercialBankExcha
                 return Jsoup
                         .connect(url())
                         .validateTLSCertificates(false)
+                        .cookies(ExecutionContext.getInstance().cookies(bank()))
                         .header("Content-Type", "application/json;charset=UTF-8")
                         .requestBody(payload)
                         .method(Connection.Method.POST)
@@ -142,7 +146,14 @@ public enum CommercialBankExchangeRateScraperType implements CommercialBankExcha
 
     };
 
-    static final int bankCount = CommercialBankExchangeRateScraperType.values().length;
+    private static final int bankCount = CommercialBankExchangeRateScraperType.values().length;
+    private static final List<CommercialBank> commercialBanks = new ArrayList<>(bankCount);
+
+    static {
+        for (CommercialBankExchangeRateScraper bankScraper : CommercialBankExchangeRateScraperType.values()) {
+            commercialBanks.add(new CommercialBank(bankScraper.bank(), bankScraper.description(), bankScraper.url()));
+        }
+    }
 
     private final String description;
     private final String url;
@@ -174,6 +185,10 @@ public enum CommercialBankExchangeRateScraperType implements CommercialBankExcha
 
     public static int bankCount() {
         return bankCount;
+    }
+
+    public static List<CommercialBank> commercialBanks() {
+        return commercialBanks;
     }
 
 }
