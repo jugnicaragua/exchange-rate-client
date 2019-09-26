@@ -1,16 +1,16 @@
 package ni.jug.exchangerate.cb;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *
@@ -85,7 +85,7 @@ public enum CommercialBankExchangeRateScraperType implements CommercialBankExcha
                         .userAgent(UA_FIREFOX_V64)
                         .get();
             } catch (IOException ioe) {
-                throw new IllegalArgumentException("No se pudo obtener el contenido del sitio web de [" + bank() + "]", ioe);
+                throw newConnectionError(ioe);
             }
         }
 
@@ -100,7 +100,7 @@ public enum CommercialBankExchangeRateScraperType implements CommercialBankExcha
         }
 
     }, LAFISE("Latin American Financial Services", "https://www.lafise.com/DesktopModules/Servicios/API/TasaCambio/VerPorPaisActivo") {
-        private static final String OFFSET_TEXT = "\"Descripcion\":\"Córdoba - Dolar\"";
+        private static final String OFFSET_TEXT = "\"Córdoba - Dólar\",";
         private static final String BUY_LITERAL = "\"ValorCompra\":\"NIO: ";
         private static final String SELL_LITERAL = "\"ValorVenta\":\"USD: ";
         private static final String CLOSE_LITERAL = "\",";
@@ -135,7 +135,7 @@ public enum CommercialBankExchangeRateScraperType implements CommercialBankExcha
                         .execute()
                         .body();
             } catch (IOException ioe) {
-                throw new IllegalArgumentException("No se pudo obtener el contenido del sitio web de [" + bank() + "]", ioe);
+                throw newConnectionError(ioe);
             }
         }
 

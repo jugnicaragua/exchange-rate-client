@@ -1,6 +1,7 @@
 package ni.jug.ncb.exchangerate;
 
 import ni.jug.exchangerate.ExchangeRateClient;
+import ni.jug.exchangerate.cb.CommercialBankExchangeRateScraperType;
 import ni.jug.exchangerate.ncb.MonthlyExchangeRate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -63,6 +64,18 @@ public class ExchangeRateTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             client.getOfficialMonthlyExchangeRate(LocalDate.of(2011, 12, 1));
         });
+    }
+
+    @Test
+    public void testLAFISE() {
+        CommercialBankExchangeRateScraperType scraper = CommercialBankExchangeRateScraperType.LAFISE;
+        scraper.extractData();
+    }
+
+    @Test
+    public void testBAC() {
+        CommercialBankExchangeRateScraperType scraper = CommercialBankExchangeRateScraperType.BAC;
+        scraper.extractData();
     }
 
 }
