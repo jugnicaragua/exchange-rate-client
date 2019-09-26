@@ -1,11 +1,12 @@
 package ni.jug.exchangerate.cb;
 
-import java.io.IOException;
-import java.math.BigDecimal;
 import ni.jug.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+
+import java.io.IOException;
+import java.math.BigDecimal;
 
 /**
  *
@@ -15,8 +16,9 @@ import org.jsoup.select.Elements;
  */
 public interface CommercialBankExchangeRateScraper {
 
-    String ERROR_FOR_PARSING_TEXT = "No se pudo extraer el dato de [%s]";
-    String ERROR_FOR_READING_HTML = "No se pudo extraer el dato, el HTML del sitio web de [%s] ha sido modificado";
+    String ERROR_FOR_CONNECTING_TO_WEBSITE = "Error de conexion: No se pudo obtener el contenido del sitio web de [%s]";
+    String ERROR_FOR_PARSING_TEXT = "No se pudo extraer el dato: el sitio web de [%s] presenta contenido inesperado: %s";
+    String ERROR_FOR_READING_HTML = "No se pudo extraer el dato: el HTML del sitio web de [%s] ha sido modificado";
 
     String bank();
 
@@ -33,7 +35,7 @@ public interface CommercialBankExchangeRateScraper {
                     .cookies(ExecutionContext.getInstance().cookies(bank()))
                     .get();
         } catch (IOException ioe) {
-            throw new IllegalArgumentException("No se pudo obtener el contenido del sitio web de [" + bank() + "]", ioe);
+            throw newConnectionError(ioe);
         }
     }
 
@@ -55,7 +57,7 @@ public interface CommercialBankExchangeRateScraper {
                     .execute()
                     .body();
         } catch (IOException ioe) {
-            throw new IllegalArgumentException("No se pudo obtener el contenido del sitio web de [" + bank() + "]", ioe);
+            throw newConnectionError(ioe);
         }
     }
 
@@ -63,13 +65,13 @@ public interface CommercialBankExchangeRateScraper {
             String offset) {
         String buyText = Strings.substringBetween(content, leftBuy, rightBuy, offset);
         if (buyText.isEmpty()) {
-            throwParsingError(content);
+            throw newParsingError(content);
         }
         BigDecimal buy = new BigDecimal(buyText).setScale(4);
 
         String sellText = Strings.substringBetween(content, leftSell, rightSell, leftBuy + buyText + rightBuy);
         if (sellText.isEmpty()) {
-            throwParsingError(content);
+            throw newParsingError(content);
         }
         BigDecimal sell = new BigDecimal(sellText).setScale(4);
 
@@ -86,20 +88,24 @@ public interface CommercialBankExchangeRateScraper {
         return extractDataFromPlainTextResponse(open, close, open, close, null);
     }
 
-    default void throwParsingError(String value) {
-        throw new IllegalArgumentException(String.format(ERROR_FOR_PARSING_TEXT, value));
-    }
-
     default BigDecimal parseText(String value, String offset) {
         String exchangeRateText = (offset == null || offset.isEmpty()) ? value : Strings.substringAfter(value, offset);
         if (exchangeRateText.isEmpty()) {
-            throwParsingError(value);
+            throw newParsingError(value);
         }
         return new BigDecimal(exchangeRateText).setScale(4);
     }
 
     default BigDecimal parseText(String value) {
         return parseText(value, null);
+    }
+
+    default IllegalArgumentException newParsingError(String value) {
+        return new IllegalArgumentException(String.format(ERROR_FOR_PARSING_TEXT, bank(), value));
+    }
+
+    default IllegalArgumentException newConnectionError(IOException ioe) {
+        return new IllegalArgumentException(String.format(ERROR_FOR_CONNECTING_TO_WEBSITE, bank()), ioe);
     }
 
 }
