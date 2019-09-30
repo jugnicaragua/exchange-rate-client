@@ -116,7 +116,7 @@ public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTr
                 })
                 .collect(Collectors.toList());
 
-        ExecutorService service = Executors.newFixedThreadPool(4);
+        ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         try {
             List<Future<ExchangeRateTrade>> futures = service.invokeAll(tasks);
