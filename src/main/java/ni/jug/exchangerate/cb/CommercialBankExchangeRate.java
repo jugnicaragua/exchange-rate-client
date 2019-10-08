@@ -1,6 +1,7 @@
 package ni.jug.exchangerate.cb;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -84,14 +85,6 @@ public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTr
         return worstBuyPrice;
     }
 
-    boolean isUnavailableBanks() {
-        return unavailableBanks.size() > 0;
-    }
-
-    int fetchedBanksCount() {
-        return trades.size();
-    }
-
     public List<String> unavailableBanks() {
         return Collections.unmodifiableList(unavailableBanks);
     }
@@ -101,60 +94,58 @@ public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTr
         return trades.iterator();
     }
 
-    private static List<ExchangeRateTrade> startCrawling() {
+    public static CommercialBankExchangeRate create() {
         List<Callable<ExchangeRateTrade>> tasks = Stream.of(CommercialBankExchangeRateScraperType.values())
-                .map(bank -> {
-                    Callable<ExchangeRateTrade> task = () -> {
-                        try {
-                            return bank.extractData();
-                        } catch (Exception ex) {
-                            LOGGER.severe(ex.getMessage());
-                            return null;
-                        }
-                    };
-                    return task;
-                })
-                .collect(Collectors.toList());
+                    .map(scraper -> {
+                        Callable<ExchangeRateTrade> task = () -> {
+                            try {
+                                return scraper.extractData();
+                            } catch (Exception ex) {
+                                LOGGER.severe(ex.getMessage());
+                                return null;
+                            }
+                        };
+                        return task;
+                    })
+                    .collect(Collectors.toList());
 
         ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        List<ExchangeRateTrade> trades;
+        List<ExchangeRateTrade> bestTrades = new ArrayList<>();
+        int bankCount = CommercialBankExchangeRateScraperType.bankCount();
+        int count = 1;
 
         try {
-            List<Future<ExchangeRateTrade>> futures = service.invokeAll(tasks);
-            return futures.stream()
-                    .map(f -> {
-                        try {
-                            return f.get();
-                        } catch (InterruptedException | ExecutionException ex) {
-                            LOGGER.severe(ex.getMessage());
-                            return null;
-                        }
-                    })
-                    .filter(data -> data != null)
-                    .collect(Collectors.toList());
+            while (count++ <= 3 && bestTrades.size() < bankCount) {
+                if (count > 2) {
+                    LOGGER.log(Level.INFO, "Repitiendo peticion. Solo se recuperaron datos de {0} de {1} bancos",
+                                new Object[]{bestTrades.size(), bankCount});
+                }
+
+                List<Future<ExchangeRateTrade>> futures = service.invokeAll(tasks);
+                trades = futures.stream()
+                            .map(f -> {
+                                try {
+                                    return f.get();
+                                } catch (InterruptedException | ExecutionException ex) {
+                                    LOGGER.severe(ex.getMessage());
+                                    return null;
+                                }
+                            })
+                            .filter(data -> data != null)
+                            .collect(Collectors.toList());
+
+                if (trades.size() > bestTrades.size()) {
+                    bestTrades = trades;
+                }
+            }
         } catch (InterruptedException ie) {
             LOGGER.severe(ie.getMessage());
         } finally {
             service.shutdown();
         }
 
-        return Collections.emptyList();
-    }
-
-    public static CommercialBankExchangeRate create() {
-        int count = 1;
-        CommercialBankExchangeRate client = new CommercialBankExchangeRate(startCrawling());
-        CommercialBankExchangeRate bestAttempt = client;
-
-        while (client.isUnavailableBanks() && count++ <= 3) {
-            LOGGER.log(Level.INFO, "Repitiendo peticion. Solo se recuperaron datos de {0} de {1} bancos",
-                    new Object[]{client.fetchedBanksCount(), CommercialBankExchangeRateScraperType.bankCount()});
-            client = new CommercialBankExchangeRate(startCrawling());
-            if (client.fetchedBanksCount() > bestAttempt.fetchedBanksCount()) {
-                bestAttempt = client;
-            }
-        }
-
-        return bestAttempt;
+        return new CommercialBankExchangeRate(bestTrades);
     }
 
 }
