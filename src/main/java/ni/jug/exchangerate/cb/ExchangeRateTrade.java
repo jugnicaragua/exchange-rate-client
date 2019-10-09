@@ -21,7 +21,7 @@ public final class ExchangeRateTrade {
     private final boolean worstBuyPrice;
     private final boolean worstSellPrice;
 
-    public ExchangeRateTrade(String bank, LocalDate date, BigDecimal buy, BigDecimal sell, BigDecimal bestBuyPrice,
+    ExchangeRateTrade(String bank, LocalDate date, BigDecimal buy, BigDecimal sell, BigDecimal bestBuyPrice,
             BigDecimal bestSellPrice, BigDecimal worstBuyPrice, BigDecimal worstSellPrice) {
         this.bank = Objects.requireNonNull(bank);
         this.date = Objects.requireNonNull(date);
@@ -33,7 +33,7 @@ public final class ExchangeRateTrade {
         this.worstSellPrice = worstSellPrice != null && worstSellPrice.compareTo(sell) == 0;
     }
 
-    public ExchangeRateTrade(String bank, BigDecimal buy, BigDecimal sell) {
+    ExchangeRateTrade(String bank, BigDecimal buy, BigDecimal sell) {
         this(bank, LocalDate.now(), buy, sell, null, null, null, null);
     }
 
@@ -69,7 +69,7 @@ public final class ExchangeRateTrade {
         return worstSellPrice;
     }
 
-    public ExchangeRateTrade usingPrices(BigDecimal bestBuyPrice,
+    public ExchangeRateTrade withBestPrices(BigDecimal bestBuyPrice,
             BigDecimal bestSellPrice, BigDecimal worstBuyPrice, BigDecimal worstSellPrice) {
         return new ExchangeRateTrade(bank, date, buy, sell, bestBuyPrice, bestSellPrice, worstBuyPrice, worstSellPrice);
     }
