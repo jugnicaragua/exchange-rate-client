@@ -3,9 +3,10 @@ package ni.jug.exchangerate.cb;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,7 +16,7 @@ import java.util.stream.Stream;
 /**
  *
  * @author Armando Alaniz
- * @version 2.0
+ * @version 3.0
  * @since 1.0
  */
 public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTrade> {
@@ -24,45 +25,21 @@ public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTr
 
     private final List<ExchangeRateTrade> trades;
     private final List<String> unavailableBanks;
-    private final BigDecimal bestBuyPrice;
-    private final BigDecimal worstBuyPrice;
-    private final BigDecimal bestSellPrice;
-    private final BigDecimal worstSellPrice;
+    private final ExchangeRateStatistics statistics;
 
     private CommercialBankExchangeRate(List<ExchangeRateTrade> commercialBankTrades) {
-        // Obtener los bancos de los cuales no se pudo obtener datos
-        List<String> fetchedBanks = commercialBankTrades.stream()
-                .map(ExchangeRateTrade::bank)
-                .collect(Collectors.toList());
+        statistics = commercialBankTrades.stream()
+                    .collect(ExchangeRateStatistics::new, ExchangeRateStatistics::accumulate, ExchangeRateStatistics::combine);
+
         unavailableBanks = Stream.of(CommercialBankExchangeRateScraperType.values())
-                .filter(scraper -> !fetchedBanks.contains(scraper.bank()))
-                .map(CommercialBankExchangeRateScraperType::bank)
-                .collect(Collectors.toList());
-
-        // Obtener mejor y peor precio
-        bestBuyPrice = commercialBankTrades.stream()
-                .map(ExchangeRateTrade::buy)
-                .max(Comparator.naturalOrder())
-                .orElse(BigDecimal.ZERO);
-
-        worstBuyPrice = commercialBankTrades.stream()
-                .map(ExchangeRateTrade::buy)
-                .min(Comparator.naturalOrder())
-                .orElse(BigDecimal.ZERO);
-
-        bestSellPrice = commercialBankTrades.stream()
-                .map(ExchangeRateTrade::sell)
-                .min(Comparator.naturalOrder())
-                .orElse(BigDecimal.ZERO);
-
-        worstSellPrice = commercialBankTrades.stream()
-                .map(ExchangeRateTrade::sell)
-                .max(Comparator.naturalOrder())
-                .orElse(BigDecimal.ZERO);
+                    .map(CommercialBankExchangeRateScraperType::bank)
+                    .filter(bank -> !statistics.banks.contains(bank))
+                    .collect(Collectors.toList());
 
         trades = commercialBankTrades.stream()
-                .map(trade -> trade.usingPrices(bestBuyPrice, bestSellPrice, worstBuyPrice, worstSellPrice))
-                .collect(Collectors.toList());
+                    .map(trade -> trade.withBestPrices(statistics.bestBuyPrice, statistics.bestSellPrice, statistics.worstBuyPrice,
+                                statistics.worstSellPrice))
+                    .collect(Collectors.toList());
     }
 
     public List<ExchangeRateTrade> trades() {
@@ -70,19 +47,19 @@ public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTr
     }
 
     public BigDecimal bestSellPrice() {
-        return bestSellPrice;
+        return statistics.bestSellPrice;
     }
 
     public BigDecimal worstSellPrice() {
-        return worstSellPrice;
+        return statistics.worstSellPrice;
     }
 
     public BigDecimal bestBuyPrice() {
-        return bestBuyPrice;
+        return statistics.bestBuyPrice;
     }
 
     public BigDecimal worstBuyPrice() {
-        return worstBuyPrice;
+        return statistics.worstBuyPrice;
     }
 
     public List<String> unavailableBanks() {
@@ -92,6 +69,50 @@ public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTr
     @Override
     public Iterator<ExchangeRateTrade> iterator() {
         return trades.iterator();
+    }
+
+    class ExchangeRateStatistics {
+        Set<String> banks;
+        BigDecimal bestSellPrice;
+        BigDecimal worstSellPrice;
+        BigDecimal bestBuyPrice;
+        BigDecimal worstBuyPrice;
+
+        ExchangeRateStatistics() {
+            banks = new HashSet<>();
+        }
+
+        public void accumulate(ExchangeRateTrade trade) {
+            banks.add(trade.bank());
+            if (bestSellPrice == null || trade.sell().compareTo(bestSellPrice) < 0) {
+                bestSellPrice = trade.sell();
+            }
+            if (worstSellPrice == null || trade.sell().compareTo(worstSellPrice) > 0) {
+                worstSellPrice = trade.sell();
+            }
+            if (bestBuyPrice == null || trade.buy().compareTo(bestBuyPrice) > 0) {
+                bestBuyPrice = trade.buy();
+            }
+            if (worstBuyPrice == null || trade.buy().compareTo(worstBuyPrice) < 0) {
+                worstBuyPrice = trade.buy();
+            }
+        }
+
+        public void combine(ExchangeRateStatistics other) {
+            banks.addAll(other.banks);
+            if (other.bestSellPrice.compareTo(bestSellPrice) < 0) {
+                bestSellPrice = other.bestSellPrice;
+            }
+            if (other.worstSellPrice.compareTo(worstSellPrice) > 0) {
+                worstSellPrice = other.worstSellPrice;
+            }
+            if (other.bestBuyPrice.compareTo(bestBuyPrice) > 0) {
+                bestBuyPrice = other.bestBuyPrice;
+            }
+            if (other.worstBuyPrice.compareTo(worstBuyPrice) < 0) {
+                worstBuyPrice = other.worstBuyPrice;
+            }
+        }
     }
 
     public static CommercialBankExchangeRate create() {
