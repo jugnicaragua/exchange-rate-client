@@ -100,16 +100,16 @@ public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTr
 
         public void combine(ExchangeRateStatistics other) {
             banks.addAll(other.banks);
-            if (other.bestSellPrice.compareTo(bestSellPrice) < 0) {
+            if (bestSellPrice == null || other.bestSellPrice.compareTo(bestSellPrice) < 0) {
                 bestSellPrice = other.bestSellPrice;
             }
-            if (other.worstSellPrice.compareTo(worstSellPrice) > 0) {
+            if (worstSellPrice == null || other.worstSellPrice.compareTo(worstSellPrice) > 0) {
                 worstSellPrice = other.worstSellPrice;
             }
-            if (other.bestBuyPrice.compareTo(bestBuyPrice) > 0) {
+            if (bestBuyPrice == null || other.bestBuyPrice.compareTo(bestBuyPrice) > 0) {
                 bestBuyPrice = other.bestBuyPrice;
             }
-            if (other.worstBuyPrice.compareTo(worstBuyPrice) < 0) {
+            if (worstBuyPrice == null || other.worstBuyPrice.compareTo(worstBuyPrice) < 0) {
                 worstBuyPrice = other.worstBuyPrice;
             }
         }
