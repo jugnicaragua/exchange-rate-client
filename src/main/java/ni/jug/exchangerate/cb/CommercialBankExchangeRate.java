@@ -27,7 +27,7 @@ public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTr
     private final List<String> unavailableBanks;
     private final ExchangeRateStatistics statistics;
 
-    private CommercialBankExchangeRate(List<ExchangeRateTrade> commercialBankTrades) {
+    public CommercialBankExchangeRate(List<ExchangeRateTrade> commercialBankTrades) {
         statistics = commercialBankTrades.stream()
                     .collect(ExchangeRateStatistics::new, ExchangeRateStatistics::accumulate, ExchangeRateStatistics::combine);
 
