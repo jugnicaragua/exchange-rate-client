@@ -33,8 +33,12 @@ public final class ExchangeRateTrade {
         this.worstSellPrice = worstSellPrice != null && worstSellPrice.compareTo(sell) == 0;
     }
 
-    ExchangeRateTrade(String bank, BigDecimal buy, BigDecimal sell) {
-        this(bank, LocalDate.now(), buy, sell, null, null, null, null);
+    public ExchangeRateTrade(String bank, BigDecimal buy, BigDecimal sell) {
+        this(bank, LocalDate.now(), buy, sell);
+    }
+
+    public ExchangeRateTrade(String bank, LocalDate date, BigDecimal buy, BigDecimal sell) {
+        this(bank, date, buy, sell, null, null, null, null);
     }
 
     public String bank() {
