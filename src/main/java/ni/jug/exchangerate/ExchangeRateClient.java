@@ -51,8 +51,12 @@ public final class ExchangeRateClient {
         return CommercialBankExchangeRate.create();
     }
 
-    public List<ExchangeRateTrade> commercialBanktrades() {
+    public List<ExchangeRateTrade> commercialBankTrades() {
         return CommercialBankExchangeRate.create().trades();
+    }
+
+    public List<ExchangeRateTrade> commercialBankTrades(List<ExchangeRateTrade> trades) {
+        return new CommercialBankExchangeRate(trades).trades();
     }
 
     public static List<CommercialBank> commercialBanks() {
