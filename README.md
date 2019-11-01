@@ -1,6 +1,6 @@
 # exchange-rate-client
 
-La librería es un cliente http que obtiene el tipo de cambio oficial del Banco Central de Nicaragua (BCN) y la compra/venta de divisas de los bancos comerciales que operan en Nicaragua. Para el caso del BCN, la libreria expone las mismas operaciones disponibles en el servicio web del BCN: una vez obtenidos los datos del tipo de cambio, se pueden consultar por fecha y mes-año. En el caso de los bancos comerciales, se realiza `scraping` de los siguientes bancos: BANPRO, FICOHSA, AVANZ, BAC, BDF, LAFISE. Si el `scraping` de alguno de los bancos falla, la libreria realiza 3 intentos (cada intento consiste en extraer los datos de todos los bancos) y retorna los resultados del mejor intento (aquel intento con mayor cantidad de bancos disponibles).
+Esta es una librería cliente http que obtiene el tipo de cambio oficial del Banco Central de Nicaragua (BCN https://www.bcn.gob.ni/ ) y la compra/venta de divisas de los bancos comerciales que operan en Nicaragua. Para el caso del BCN, la libreria expone las mismas operaciones disponibles en el servicio web del BCN: una vez obtenidos los datos del tipo de cambio, se pueden consultar por fecha y mes-año. En el caso de los bancos comerciales, se realiza `scraping` de los siguientes bancos: BANPRO, FICOHSA, AVANZ, BAC, BDF, LAFISE. Si el `scraping` de alguno de los bancos falla, la libreria realiza 3 intentos (cada intento consiste en extraer los datos de todos los bancos) y retorna los resultados del mejor intento (aquel intento con mayor cantidad de bancos disponibles).
 
 La libreria puede ser empaquetada a traves de `maven` para crear un `cli` (aplicacion de consola). Para construir el proyecto como `cli` se debe activar un perfil declarado en el pom.xml del proyecto (mas detalles en los siguientes apartados).
 
@@ -131,9 +131,9 @@ This software is covered under the MIT Licence (http://opensource.org/licenses/M
 
 Puedes leer el archivo de la licencia en [LICENSE][license]
 
-Copyright (c) 2018-present, JUG Nicaragua Armando Alaniz
+Copyright (c) 2018-present, JUG Nicaragua Armando Alaniz (https://javanicaragua.org/nuestro-equipo/)
 
 **Free Software, Hell Yeah!**
 
 [license]: LICENSE.txt
-[test unitario]: src/test/java/ni/jug/ncb/exchangerate/ExchangeRateScraperTest.java
+[test unitario]: src/test/java/ni/jug/ncb/exchangerate/ExchangeRateScraperTest.jav
