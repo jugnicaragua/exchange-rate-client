@@ -19,20 +19,20 @@ import java.util.stream.Stream;
  * @version 3.0
  * @since 1.0
  */
-public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTrade> {
+public final class CommercialBankRequestor implements Iterable<ExchangeRateTrade> {
 
-    private static final Logger LOGGER = Logger.getLogger(CommercialBankExchangeRate.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CommercialBankRequestor.class.getName());
 
     private final List<ExchangeRateTrade> trades;
     private final List<String> unavailableBanks;
     private final ExchangeRateStatistics statistics;
 
-    public CommercialBankExchangeRate(List<ExchangeRateTrade> commercialBankTrades) {
+    public CommercialBankRequestor(List<ExchangeRateTrade> commercialBankTrades) {
         statistics = commercialBankTrades.stream()
                     .collect(ExchangeRateStatistics::new, ExchangeRateStatistics::accumulate, ExchangeRateStatistics::combine);
 
-        unavailableBanks = Stream.of(CommercialBankExchangeRateScraperType.values())
-                    .map(CommercialBankExchangeRateScraperType::bank)
+        unavailableBanks = Stream.of(CommercialBankScraperType.values())
+                    .map(CommercialBankScraperType::bank)
                     .filter(bank -> !statistics.banks.contains(bank))
                     .collect(Collectors.toList());
 
@@ -115,8 +115,8 @@ public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTr
         }
     }
 
-    public static CommercialBankExchangeRate create() {
-        List<Callable<ExchangeRateTrade>> tasks = Stream.of(CommercialBankExchangeRateScraperType.values())
+    public static CommercialBankRequestor create() {
+        List<Callable<ExchangeRateTrade>> tasks = Stream.of(CommercialBankScraperType.values())
                     .map(scraper -> {
                         Callable<ExchangeRateTrade> task = () -> {
                             try {
@@ -133,7 +133,7 @@ public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTr
         ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         List<ExchangeRateTrade> trades;
         List<ExchangeRateTrade> bestTrades = new ArrayList<>();
-        int bankCount = CommercialBankExchangeRateScraperType.bankCount();
+        int bankCount = CommercialBankScraperType.bankCount();
         int count = 1;
 
         try {
@@ -166,6 +166,6 @@ public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTr
             service.shutdown();
         }
 
-        return new CommercialBankExchangeRate(bestTrades);
+        return new CommercialBankRequestor(bestTrades);
     }
 }

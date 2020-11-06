@@ -18,7 +18,7 @@ import java.util.List;
  * @version 3.0
  * @since 1.0
  */
-public enum CommercialBankExchangeRateScraperType implements CommercialBankExchangeRateScraper {
+public enum CommercialBankScraperType implements CommercialBankScraper {
 
     BANPRO("Banco de la Produccion", "https://www.banprogrupopromerica.com.ni/umbraco/Surface/TipoCambio/Run?json={\"operacion\":2}") {
         private static final String OPEN_TAG = "\\u003cTD class=gris10px height=20 vAlign=middle width=75 align=center\\u003e";
@@ -145,11 +145,11 @@ public enum CommercialBankExchangeRateScraperType implements CommercialBankExcha
 
     };
 
-    private static final int BANK_COUNT = CommercialBankExchangeRateScraperType.values().length;
+    private static final int BANK_COUNT = CommercialBankScraperType.values().length;
     private static final List<CommercialBank> COMMERCIAL_BANKS = new ArrayList<>(BANK_COUNT);
 
     static {
-        for (CommercialBankExchangeRateScraper bankScraper : CommercialBankExchangeRateScraperType.values()) {
+        for (CommercialBankScraper bankScraper : CommercialBankScraperType.values()) {
             COMMERCIAL_BANKS.add(new CommercialBank(bankScraper.bank(), bankScraper.description(), bankScraper.url()));
         }
     }
@@ -157,12 +157,12 @@ public enum CommercialBankExchangeRateScraperType implements CommercialBankExcha
     private final String description;
     private final String url;
 
-    CommercialBankExchangeRateScraperType(String description, String url) {
+    CommercialBankScraperType(String description, String url) {
         this.description = description;
         this.url = url;
     }
 
-    CommercialBankExchangeRateScraperType(String url) {
+    CommercialBankScraperType(String url) {
         this.description = name();
         this.url = url;
     }

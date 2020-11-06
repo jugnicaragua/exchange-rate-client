@@ -23,9 +23,9 @@ import java.util.logging.Logger;
  * @version 2.0
  * @since 2.0
  */
-public class CentralBankExchangeRateScraper {
+public class CentralBankScraper {
 
-    private static final Logger LOGGER = Logger.getLogger(CentralBankExchangeRateScraper.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CentralBankScraper.class.getName());
 
     public static final int MINIMUM_YEAR = 2012;
 

@@ -1,10 +1,10 @@
 package ni.jug.exchangerate;
 
 import ni.jug.exchangerate.cb.CommercialBank;
-import ni.jug.exchangerate.cb.CommercialBankExchangeRate;
-import ni.jug.exchangerate.cb.CommercialBankExchangeRateScraperType;
+import ni.jug.exchangerate.cb.CommercialBankRequestor;
+import ni.jug.exchangerate.cb.CommercialBankScraperType;
 import ni.jug.exchangerate.cb.ExchangeRateTrade;
-import ni.jug.exchangerate.ncb.CentralBankExchangeRateScraper;
+import ni.jug.exchangerate.ncb.CentralBankScraper;
 import ni.jug.exchangerate.ncb.MonthlyExchangeRate;
 
 import java.math.BigDecimal;
@@ -35,22 +35,22 @@ public final class ExchangeRateClient {
     }
 
     public static MonthlyExchangeRate getOfficialMonthlyExchangeRate(YearMonth yearMonth, int retryMaxCount) throws ExchangeRateException {
-        return CentralBankExchangeRateScraper.getMonthlyExchangeRate(yearMonth, retryMaxCount);
+        return CentralBankScraper.getMonthlyExchangeRate(yearMonth, retryMaxCount);
     }
 
-    public static CommercialBankExchangeRate commercialBankExchangeRate() {
-        return CommercialBankExchangeRate.create();
+    public static CommercialBankRequestor commercialBankRequestor() {
+        return CommercialBankRequestor.create();
     }
 
     public static List<ExchangeRateTrade> commercialBankTrades() {
-        return CommercialBankExchangeRate.create().trades();
+        return CommercialBankRequestor.create().trades();
     }
 
     public static List<ExchangeRateTrade> commercialBankTrades(List<ExchangeRateTrade> trades) {
-        return new CommercialBankExchangeRate(trades).trades();
+        return new CommercialBankRequestor(trades).trades();
     }
 
     public static List<CommercialBank> commercialBanks() {
-        return CommercialBankExchangeRateScraperType.commercialBanks();
+        return CommercialBankScraperType.commercialBanks();
     }
 }

@@ -14,7 +14,7 @@ import java.math.BigDecimal;
  * @version 1.0
  * @since 1.0
  */
-public interface CommercialBankExchangeRateScraper {
+public interface CommercialBankScraper {
 
     String ERROR_CONNECTING_TO_WEBSITE = "Error de conexion al sitio web de [%s]";
     String ERROR_PARSING_TEXT = "El DOM del sitio web de [%s] tiene un formato diferente al esperado: [%s]";

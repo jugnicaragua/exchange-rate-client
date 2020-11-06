@@ -1,7 +1,7 @@
 package ni.jug.exchangerate;
 
 import ni.jug.cli.CLIHelper;
-import ni.jug.exchangerate.cb.CommercialBankExchangeRate;
+import ni.jug.exchangerate.cb.CommercialBankRequestor;
 import ni.jug.exchangerate.cb.ExchangeRateTrade;
 import ni.jug.exchangerate.ncb.MonthlyExchangeRate;
 import ni.jug.util.Dates;
@@ -173,13 +173,13 @@ public class ExchangeRateCLI {
     }
 
     private void fetchExchangeRateFromCommercialBanks() throws ExchangeRateException {
-        CommercialBankExchangeRate commercialBankExchangeRate = ExchangeRateClient.commercialBankExchangeRate();
+        CommercialBankRequestor commercialBankRequestor = ExchangeRateClient.commercialBankRequestor();
         BigDecimal officialExchangeRate = ExchangeRateClient.getOfficialExchangeRate(LocalDate.now());
 
         StringBuilder result = new StringBuilder("\n");
         result.append(DASH_PROMPT);
         result.append("Bancos no disponibles: ");
-        result.append(commercialBankExchangeRate.unavailableBanks().stream().collect(Collectors.joining(", ")));
+        result.append(commercialBankRequestor.unavailableBanks().stream().collect(Collectors.joining(", ")));
         result.append("\n");
         result.append(DASH_PROMPT);
         result.append("\n");
@@ -190,7 +190,7 @@ public class ExchangeRateCLI {
         result.append(String.format("%12s", "Oficial"));
         result.append("\n");
         result.append(DASH_PROMPT);
-        for (ExchangeRateTrade trade : commercialBankExchangeRate) {
+        for (ExchangeRateTrade trade : commercialBankRequestor) {
             result.append(String.format("%-15s", trade.bank()));
             String sell = trade.sell().toPlainString() + (trade.isBestSellPrice() ? "*" : "");
             result.append(String.format("%12s", sell));
