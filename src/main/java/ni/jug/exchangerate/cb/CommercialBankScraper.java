@@ -13,6 +13,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -147,6 +151,8 @@ public enum CommercialBankScraper {
         }
     };
 
+    private static final Logger LOGGER = Logger.getLogger(CommercialBankScraper.class.getName());
+
     public static final String ERROR_BANK_CONNECTION = "Error durante la conexion al sitio web de [%s]";
     public static final String ERROR_PARSING_TEXT = "El DOM del sitio web de [%s] tiene un formato diferente al esperado: [%s]";
     public static final String ERROR_READING_HTML = "El DOM del sitio web de [%s] tiene un formato diferente al esperado";
@@ -269,12 +275,29 @@ public enum CommercialBankScraper {
         return new ExchangeRateException(ex, ERROR_BANK_CONNECTION, bank());
     }
 
+    public Callable<ExchangeRateTrade> createTask() {
+        return () -> {
+            try {
+                return fetchData();
+            } catch(ExchangeRateException ex) {
+                LOGGER.severe(ex.getMessage());
+                return null;
+            }
+        };
+    }
+
     public static int bankCount() {
         return BANK_COUNT;
     }
 
     public static List<CommercialBank> commercialBanks() {
         return COMMERCIAL_BANKS;
+    }
+
+    public static List<Callable<ExchangeRateTrade>> createTasks() {
+        return Stream.of(values())
+                .map(CommercialBankScraper::createTask)
+                .collect(Collectors.toList());
     }
 
     class Delimiter {

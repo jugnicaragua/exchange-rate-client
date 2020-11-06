@@ -1,13 +1,16 @@
 package ni.jug.exchangerate.cb;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -116,23 +119,9 @@ public final class CommercialBankRequestor implements Iterable<ExchangeRateTrade
     }
 
     public static CommercialBankRequestor create() {
-        List<Callable<ExchangeRateTrade>> tasks = Stream.of(CommercialBankScraper.values())
-                    .map(scraper -> {
-                        Callable<ExchangeRateTrade> task = () -> {
-                            try {
-                                return scraper.fetchData();
-                            } catch (Exception ex) {
-                                LOGGER.severe(ex.getMessage());
-                                return null;
-                            }
-                        };
-                        return task;
-                    })
-                    .collect(Collectors.toList());
-
         ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         List<ExchangeRateTrade> trades;
-        List<ExchangeRateTrade> bestTrades = new ArrayList<>();
+        List<ExchangeRateTrade> bestTrades = Collections.emptyList();
         int bankCount = CommercialBankScraper.bankCount();
         int count = 1;
 
@@ -143,6 +132,7 @@ public final class CommercialBankRequestor implements Iterable<ExchangeRateTrade
                                 new Object[] {bestTrades.size(), bankCount});
                 }
 
+                List<Callable<ExchangeRateTrade>> tasks = CommercialBankScraper.createTasks();
                 List<Future<ExchangeRateTrade>> futures = service.invokeAll(tasks);
                 trades = futures.stream()
                             .map(f -> {
