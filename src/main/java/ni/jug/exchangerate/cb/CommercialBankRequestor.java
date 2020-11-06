@@ -31,8 +31,8 @@ public final class CommercialBankRequestor implements Iterable<ExchangeRateTrade
         statistics = commercialBankTrades.stream()
                     .collect(ExchangeRateStatistics::new, ExchangeRateStatistics::accumulate, ExchangeRateStatistics::combine);
 
-        unavailableBanks = Stream.of(CommercialBankScraperType.values())
-                    .map(CommercialBankScraperType::bank)
+        unavailableBanks = Stream.of(CommercialBankScraper.values())
+                    .map(CommercialBankScraper::bank)
                     .filter(bank -> !statistics.banks.contains(bank))
                     .collect(Collectors.toList());
 
@@ -116,11 +116,11 @@ public final class CommercialBankRequestor implements Iterable<ExchangeRateTrade
     }
 
     public static CommercialBankRequestor create() {
-        List<Callable<ExchangeRateTrade>> tasks = Stream.of(CommercialBankScraperType.values())
+        List<Callable<ExchangeRateTrade>> tasks = Stream.of(CommercialBankScraper.values())
                     .map(scraper -> {
                         Callable<ExchangeRateTrade> task = () -> {
                             try {
-                                return scraper.extractData();
+                                return scraper.fetchData();
                             } catch (Exception ex) {
                                 LOGGER.severe(ex.getMessage());
                                 return null;
@@ -133,7 +133,7 @@ public final class CommercialBankRequestor implements Iterable<ExchangeRateTrade
         ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         List<ExchangeRateTrade> trades;
         List<ExchangeRateTrade> bestTrades = new ArrayList<>();
-        int bankCount = CommercialBankScraperType.bankCount();
+        int bankCount = CommercialBankScraper.bankCount();
         int count = 1;
 
         try {

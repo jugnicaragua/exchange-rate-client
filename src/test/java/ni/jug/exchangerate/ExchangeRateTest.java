@@ -1,6 +1,6 @@
 package ni.jug.exchangerate;
 
-import ni.jug.exchangerate.cb.CommercialBankScraperType;
+import ni.jug.exchangerate.cb.CommercialBankScraper;
 import ni.jug.exchangerate.ncb.MonthlyExchangeRate;
 import org.junit.jupiter.api.Test;
 
@@ -64,14 +64,14 @@ public class ExchangeRateTest {
     }
 
     @Test
-    public void testLAFISE() {
-        CommercialBankScraperType scraper = CommercialBankScraperType.LAFISE;
-        scraper.extractData();
+    public void testLAFISE() throws ExchangeRateException {
+        CommercialBankScraper scraper = CommercialBankScraper.LAFISE;
+        scraper.fetchData();
     }
 
     @Test
-    public void testBAC() {
-        CommercialBankScraperType scraper = CommercialBankScraperType.BAC;
-        scraper.extractData();
+    public void testBAC() throws ExchangeRateException {
+        CommercialBankScraper scraper = CommercialBankScraper.BAC;
+        scraper.fetchData();
     }
 }

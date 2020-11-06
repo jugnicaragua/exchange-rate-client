@@ -2,7 +2,7 @@ package ni.jug.exchangerate;
 
 import ni.jug.exchangerate.cb.CommercialBank;
 import ni.jug.exchangerate.cb.CommercialBankRequestor;
-import ni.jug.exchangerate.cb.CommercialBankScraperType;
+import ni.jug.exchangerate.cb.CommercialBankScraper;
 import ni.jug.exchangerate.cb.ExchangeRateTrade;
 import ni.jug.exchangerate.ncb.CentralBankScraper;
 import ni.jug.exchangerate.ncb.MonthlyExchangeRate;
@@ -51,6 +51,6 @@ public final class ExchangeRateClient {
     }
 
     public static List<CommercialBank> commercialBanks() {
-        return CommercialBankScraperType.commercialBanks();
+        return CommercialBankScraper.commercialBanks();
     }
 }

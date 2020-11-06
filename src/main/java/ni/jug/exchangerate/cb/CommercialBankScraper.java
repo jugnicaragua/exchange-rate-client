@@ -1,54 +1,204 @@
 package ni.jug.exchangerate.cb;
 
+import ni.jug.exchangerate.ExchangeRateException;
 import ni.jug.util.Strings;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *
  * @author Armando Alaniz
- * @version 1.0
+ * @version 3.0
  * @since 1.0
  */
-public interface CommercialBankScraper {
+public enum CommercialBankScraper {
 
-    String ERROR_CONNECTING_TO_WEBSITE = "Error de conexion al sitio web de [%s]";
-    String ERROR_PARSING_TEXT = "El DOM del sitio web de [%s] tiene un formato diferente al esperado: [%s]";
-    String ERROR_READING_HTML = "El DOM del sitio web de [%s] tiene un formato diferente al esperado";
+    BANPRO("Banco de la Produccion", "https://www.banprogrupopromerica.com.ni/umbraco/Surface/TipoCambio/Run?json={\"operacion\":2}") {
+        private static final String OPEN_TAG = "\\u003cTD class=gris10px height=20 vAlign=middle width=75 align=center\\u003e";
+        private static final String CLOSE_TAG = "\\u003c/TD\\u003e";
 
-    String bank();
+        private final Delimiter DELIMITER = new Delimiter(OPEN_TAG, CLOSE_TAG);
 
-    String description();
+        @Override
+        public ExchangeRateTrade fetchData() throws ExchangeRateException {
+            return fetchData(DELIMITER);
+        }
 
-    String url();
+    }, FICOHSA("https://www.ficohsa.com/ni/nicaragua/tipo-de-cambio/") {
+        @Override
+        public ExchangeRateTrade fetchData() throws ExchangeRateException {
+            Elements spans = queryCssSelector(2, "article > p > span");
 
-    ExchangeRateTrade extractData();
+            Iterator<Element> itr = spans.iterator();
+            BigDecimal buy = parseText(itr.next().text(), "Compra: ");
+            BigDecimal sell = parseText(itr.next().text(), "Venta: ");
 
-    default Document makeGetRequest() {
+            return new ExchangeRateTrade(bank(), buy, sell);
+        }
+
+    }, AVANZ("https://www.avanzbanc.com/Pages/Empresas/ServiciosFinancieros/MesaCambio.aspx") {
+        @Override
+        public ExchangeRateTrade fetchData() throws ExchangeRateException {
+            Elements spans = queryCssSelector(2, "#avanz-mobile-tipo-cambio > strong");
+
+            Iterator<Element> itr = spans.iterator();
+            BigDecimal buy = parseText(itr.next().text());
+            BigDecimal sell = parseText(itr.next().text());
+
+            return new ExchangeRateTrade(bank(), buy, sell);
+        }
+
+    }, BAC("Banco de America Central", "https://www.sucursalelectronica.com/redir/showLogin.go") {
+        private static final String NIC_BLOCK_LITERAL = "countryCode : 'NI',";
+
+        private final Delimiter buyDelimiter = new Delimiter("buy : '", "',");
+        private final Delimiter sellDelimiter = new Delimiter("sell : '", "',");
+
+        @Override
+        public ExchangeRateTrade fetchData() throws ExchangeRateException {
+            Elements scripts = queryCssSelector(4, "script:not(script[type])");
+
+            Iterator<Element> itr = scripts.iterator();
+            itr.next();
+            itr.next();
+            itr.next();
+            Element script = itr.next();
+
+            return extractDataFromHTML(script.html(), buyDelimiter, sellDelimiter, NIC_BLOCK_LITERAL);
+        }
+
+    }, BDF("Banco de Finanzas", "https://www.bdfnet.com/") {
+        private static final String UA_FIREFOX_V64 = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:64.0) Gecko/20100101 Firefox/64.0";
+
+        @Override
+        Document getRequest() throws ExchangeRateException {
+            try {
+                return Jsoup.connect(url())
+                        .validateTLSCertificates(false)
+                        .cookies(ExecutionContext.getInstance().cookies(bank()))
+                        .userAgent(UA_FIREFOX_V64)
+                        .get();
+            } catch (IOException ioe) {
+                throw connectionError(ioe);
+            }
+        }
+
+        @Override
+        public ExchangeRateTrade fetchData() throws ExchangeRateException {
+            Elements spans = queryCssSelector(2, "#ctl00_ContentPlaceHolder1_wucHerramientas1_lblCompraDolar, " +
+                    "#ctl00_ContentPlaceHolder1_wucHerramientas1_lblVentaDolar");
+            Iterator<Element> itr = spans.iterator();
+            BigDecimal buy = parseText(itr.next().text());
+            BigDecimal sell = parseText(itr.next().text());
+            return new ExchangeRateTrade(bank(), buy, sell);
+        }
+
+    }, LAFISE("Latin American Financial Services", "https://www.lafise.com/DesktopModules/Servicios/API/TasaCambio/VerPorPaisActivo") {
+        private static final String OFFSET_TEXT = "\"Córdoba - Dólar\",";
+
+        private final Delimiter buyDelimiter = new Delimiter("\"ValorCompra\":\"NIO: ", "\",");
+        private final Delimiter sellDelimiter = new Delimiter("\"ValorVenta\":\"USD: ", "\",");
+
+        private final String payload;
+        {
+            StringBuilder data = new StringBuilder();
+            data.append('{');
+            data.append("\"Activo\": true,");
+            data.append("\"Descripcion\": \"\",");
+            data.append("\"IdPais\": -1,");
+            data.append("\"PathUrl\": \"https://www.lafise.com/blb/\",");
+            data.append("\"SimboloCompra\": \"\",");
+            data.append("\"SimboloVenta\": \"\",");
+            data.append("\"ValorCompra\": \"\",");
+            data.append("\"ValorVenta\": \"\"");
+            data.append('}');
+            payload = data.toString();
+        }
+
+        @Override
+        String getRequestAsTextPlain() throws ExchangeRateException {
+            try {
+                return Jsoup.connect(url())
+                        .validateTLSCertificates(false)
+                        .cookies(ExecutionContext.getInstance().cookies(bank()))
+                        .header("Content-Type", "application/json;charset=UTF-8")
+                        .requestBody(payload)
+                        .method(Connection.Method.POST)
+                        .ignoreContentType(true)
+                        .execute()
+                        .body();
+            } catch (IOException ioe) {
+                throw connectionError(ioe);
+            }
+        }
+
+        @Override
+        public ExchangeRateTrade fetchData() throws ExchangeRateException {
+            return fetchData(buyDelimiter, sellDelimiter, OFFSET_TEXT);
+        }
+    };
+
+    public static final String ERROR_BANK_CONNECTION = "Error durante la conexion al sitio web de [%s]";
+    public static final String ERROR_PARSING_TEXT = "El DOM del sitio web de [%s] tiene un formato diferente al esperado: [%s]";
+    public static final String ERROR_READING_HTML = "El DOM del sitio web de [%s] tiene un formato diferente al esperado";
+
+    private static final int BANK_COUNT = CommercialBankScraper.values().length;
+    private static final List<CommercialBank> COMMERCIAL_BANKS = new ArrayList<>(BANK_COUNT);
+
+    static {
+        for (CommercialBankScraper bankScraper : CommercialBankScraper.values()) {
+            COMMERCIAL_BANKS.add(new CommercialBank(bankScraper.bank(), bankScraper.description(), bankScraper.url()));
+        }
+    }
+
+    private final String description;
+    private final String url;
+
+    CommercialBankScraper(String description, String url) {
+        this.description = description;
+        this.url = url;
+    }
+
+    CommercialBankScraper(String url) {
+        this.description = name();
+        this.url = url;
+    }
+
+    public String bank() {
+        return name();
+    }
+
+    public String description() {
+        return description;
+    }
+
+    public String url() {
+        return url;
+    }
+
+    public abstract ExchangeRateTrade fetchData() throws ExchangeRateException;
+
+    Document getRequest() throws ExchangeRateException {
         try {
             return Jsoup.connect(url())
                     .validateTLSCertificates(false)
                     .cookies(ExecutionContext.getInstance().cookies(bank()))
                     .get();
         } catch (IOException ioe) {
-            throw newConnectionError(ioe);
+            throw connectionError(ioe);
         }
     }
 
-    default Elements selectExchangeRateElements(int expectedMinimumSize, String cssSelector) {
-        Document doc = makeGetRequest();
-        Elements elements = doc.select(cssSelector);
-        if (elements.size() < expectedMinimumSize) {
-            throw new IllegalArgumentException(String.format(ERROR_READING_HTML, bank()));
-        }
-        return elements;
-    }
-
-    default String fetchAsPlainText() {
+    String getRequestAsTextPlain() throws ExchangeRateException {
         try {
             return Jsoup.connect(url())
                     .validateTLSCertificates(false)
@@ -57,55 +207,87 @@ public interface CommercialBankScraper {
                     .execute()
                     .body();
         } catch (IOException ioe) {
-            throw newConnectionError(ioe);
+            throw connectionError(ioe);
         }
     }
 
-    default ExchangeRateTrade extractDataFromContent(String content, String leftBuy, String rightBuy, String leftSell, String rightSell,
-            String offset) {
-        String buyText = Strings.substringBetween(content, leftBuy, rightBuy, offset);
+    Elements queryCssSelector(int expectedMinimumSize, String cssSelector) throws ExchangeRateException {
+        Document doc = getRequest();
+        Elements elements = doc.select(cssSelector);
+        if (elements.size() < expectedMinimumSize) {
+            throw readingHTMLError();
+        }
+        return elements;
+    }
+
+    ExchangeRateTrade fetchData(Delimiter delimiter) throws ExchangeRateException {
+        return fetchData(delimiter, delimiter, null);
+    }
+
+    ExchangeRateTrade fetchData(Delimiter buyDelimiter, Delimiter sellDelimiter, String offset) throws ExchangeRateException {
+        String response = getRequestAsTextPlain();
+        return extractDataFromHTML(response, buyDelimiter, sellDelimiter, offset);
+    }
+
+    ExchangeRateTrade extractDataFromHTML(String response, Delimiter buyDelimiter, Delimiter sellDelimiter, String offset) throws ExchangeRateException {
+        String buyText = Strings.substringBetween(response, buyDelimiter.left, buyDelimiter.right, offset);
         if (buyText.isEmpty()) {
-            throw newParsingError(content);
+            throw parsingTextError(response);
         }
         BigDecimal buy = new BigDecimal(buyText).setScale(4);
 
-        String sellText = Strings.substringBetween(content, leftSell, rightSell, leftBuy + buyText + rightBuy);
+        String sellText = Strings.substringBetween(response, sellDelimiter.left, sellDelimiter.right, buyDelimiter.offset(buyText));
         if (sellText.isEmpty()) {
-            throw newParsingError(content);
+            throw parsingTextError(response);
         }
         BigDecimal sell = new BigDecimal(sellText).setScale(4);
 
         return new ExchangeRateTrade(bank(), buy, sell);
     }
 
-    default ExchangeRateTrade extractDataFromPlainTextResponse(String leftBuy, String rightBuy, String leftSell, String rightSell,
-            String offset) {
-        String response = fetchAsPlainText();
-        return extractDataFromContent(response, leftBuy, rightBuy, leftSell, rightSell, offset);
-    }
-
-    default ExchangeRateTrade extractDataFromPlainTextResponse(String open, String close) {
-        return extractDataFromPlainTextResponse(open, close, open, close, null);
-    }
-
-    default BigDecimal parseText(String value, String offset) {
+    BigDecimal parseText(String value, String offset) throws ExchangeRateException {
         String exchangeRateText = (offset == null || offset.isEmpty()) ? value : Strings.substringAfter(value, offset);
         if (exchangeRateText.isEmpty()) {
-            throw newParsingError(value);
+            throw parsingTextError(value);
         }
         return new BigDecimal(exchangeRateText).setScale(4);
     }
 
-    default BigDecimal parseText(String value) {
+    BigDecimal parseText(String value) throws ExchangeRateException {
         return parseText(value, null);
     }
 
-    default IllegalArgumentException newParsingError(String value) {
-        return new IllegalArgumentException(String.format(ERROR_PARSING_TEXT, bank(), value));
+    ExchangeRateException parsingTextError(String value) {
+        return new ExchangeRateException(ERROR_PARSING_TEXT, bank(), value);
     }
 
-    default IllegalArgumentException newConnectionError(IOException ioe) {
-        return new IllegalArgumentException(String.format(ERROR_CONNECTING_TO_WEBSITE, bank()), ioe);
+    ExchangeRateException readingHTMLError() {
+        return new ExchangeRateException(String.format(ERROR_READING_HTML, bank()));
     }
 
+    ExchangeRateException connectionError(IOException ex) {
+        return new ExchangeRateException(ex, ERROR_BANK_CONNECTION, bank());
+    }
+
+    public static int bankCount() {
+        return BANK_COUNT;
+    }
+
+    public static List<CommercialBank> commercialBanks() {
+        return COMMERCIAL_BANKS;
+    }
+
+    class Delimiter {
+        private final String left;
+        private final String right;
+
+        public Delimiter(String left, String right) {
+            this.left = left;
+            this.right = right;
+        }
+
+        String offset(String value) {
+            return new StringBuilder().append(left).append(value).append(right).toString();
+        }
+    }
 }

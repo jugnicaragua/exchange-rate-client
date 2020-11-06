@@ -15,4 +15,12 @@ public class ExchangeRateException extends Exception {
     public ExchangeRateException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public ExchangeRateException(String msg, Object... args) {
+        this(null, msg, args);
+    }
+
+    public ExchangeRateException(Throwable cause, String msg, Object... args) {
+        super(String.format(msg, args));
+    }
 }
