@@ -15,7 +15,7 @@ import java.util.List;
 /**
  *
  * @author Armando Alaniz
- * @version 2.0
+ * @version 3.0
  * @since 1.0
  */
 public enum CommercialBankExchangeRateScraperType implements CommercialBankExchangeRateScraper {
@@ -61,10 +61,9 @@ public enum CommercialBankExchangeRateScraperType implements CommercialBankExcha
 
         @Override
         public ExchangeRateTrade extractData() {
-            Elements scripts = selectExchangeRateElements(5, "script:not(script[type])");
+            Elements scripts = selectExchangeRateElements(4, "script:not(script[type])");
 
             Iterator<Element> itr = scripts.iterator();
-            itr.next();
             itr.next();
             itr.next();
             itr.next();
@@ -146,12 +145,12 @@ public enum CommercialBankExchangeRateScraperType implements CommercialBankExcha
 
     };
 
-    private static final int bankCount = CommercialBankExchangeRateScraperType.values().length;
-    private static final List<CommercialBank> commercialBanks = new ArrayList<>(bankCount);
+    private static final int BANK_COUNT = CommercialBankExchangeRateScraperType.values().length;
+    private static final List<CommercialBank> COMMERCIAL_BANKS = new ArrayList<>(BANK_COUNT);
 
     static {
         for (CommercialBankExchangeRateScraper bankScraper : CommercialBankExchangeRateScraperType.values()) {
-            commercialBanks.add(new CommercialBank(bankScraper.bank(), bankScraper.description(), bankScraper.url()));
+            COMMERCIAL_BANKS.add(new CommercialBank(bankScraper.bank(), bankScraper.description(), bankScraper.url()));
         }
     }
 
@@ -184,11 +183,11 @@ public enum CommercialBankExchangeRateScraperType implements CommercialBankExcha
     }
 
     public static int bankCount() {
-        return bankCount;
+        return BANK_COUNT;
     }
 
     public static List<CommercialBank> commercialBanks() {
-        return commercialBanks;
+        return COMMERCIAL_BANKS;
     }
 
 }

@@ -1,5 +1,11 @@
 package ni.jug.exchangerate;
 
+import ni.jug.cli.CLIHelper;
+import ni.jug.exchangerate.cb.CommercialBankExchangeRate;
+import ni.jug.exchangerate.cb.ExchangeRateTrade;
+import ni.jug.exchangerate.ncb.MonthlyExchangeRate;
+import ni.jug.util.Dates;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -7,12 +13,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import ni.jug.cli.CLIHelper;
-import ni.jug.exchangerate.cb.CommercialBankExchangeRate;
-import ni.jug.exchangerate.cb.ExchangeRateTrade;
-import ni.jug.exchangerate.ncb.MonthlyExchangeRate;
-import ni.jug.util.Dates;
 
 /**
  *
@@ -44,10 +44,6 @@ public class ExchangeRateCLI {
         help.append("  -bank: muestra el detalle de la venta y compra del dolar en los bancos comerciales\n");
     }
 
-    private ExchangeRateClient getExchangeRateClient() {
-        return new ExchangeRateClient();
-    }
-
     private String messageForWrongDate(String strDate) {
         return "El valor [" + strDate + "] no es una fecha. Ingrese una fecha en formato ISO";
     }
@@ -65,7 +61,6 @@ public class ExchangeRateCLI {
 
     private void queryBySpecificDates(String value) {
         LOGGER.info("Obtener tasa de cambio por fecha");
-        ExchangeRateClient client = getExchangeRateClient();
         BigDecimal exchangeRate;
 
         StringBuilder result = new StringBuilder(SPACE);
@@ -78,7 +73,7 @@ public class ExchangeRateCLI {
 
                 try {
                     LocalDate date = Dates.toLocalDate(strDate);
-                    exchangeRate = client.getOfficialExchangeRate(date);
+                    exchangeRate = ExchangeRateClient.getOfficialExchangeRate(date);
 
                     doAppendExchangeRateByDate(date, exchangeRate, result);
                 } catch (DateTimeParseException dtpe) {
@@ -94,7 +89,7 @@ public class ExchangeRateCLI {
                     Dates.validateDate1IsBeforeDate2(date1, date2);
 
                     while (date1.compareTo(date2) <= 0) {
-                        exchangeRate = client.getOfficialExchangeRate(date1);
+                        exchangeRate = ExchangeRateClient.getOfficialExchangeRate(date1);
                         doAppendExchangeRateByDate(date1, exchangeRate, result);
                         date1 = date1.plusDays(1);
                     }
@@ -129,7 +124,6 @@ public class ExchangeRateCLI {
 
     private void queryBySpecificYearMonths(String value) {
         LOGGER.info("Obtener tasa de cambio por año-mes");
-        ExchangeRateClient client = getExchangeRateClient();
         MonthlyExchangeRate monthlyExchangeRate;
 
         StringBuilder result = new StringBuilder(SPACE);
@@ -142,7 +136,7 @@ public class ExchangeRateCLI {
 
                 try {
                     LocalDate date = Dates.toFirstDateOfYearMonth(yearMonth);
-                    monthlyExchangeRate = client.getOfficialMonthlyExchangeRate(date);
+                    monthlyExchangeRate = ExchangeRateClient.getOfficialMonthlyExchangeRate(date);
 
                     doAppendMonthlyExchangeRate(monthlyExchangeRate, result);
                 } catch (DateTimeParseException dtpe) {
@@ -159,7 +153,7 @@ public class ExchangeRateCLI {
                     Dates.validateDate1IsBeforeDate2(date1, date2);
 
                     while (date1.compareTo(date2) <= 0) {
-                        monthlyExchangeRate = client.getOfficialMonthlyExchangeRate(date1);
+                        monthlyExchangeRate = ExchangeRateClient.getOfficialMonthlyExchangeRate(date1);
                         doAppendMonthlyExchangeRate(monthlyExchangeRate, result);
                         date1 = date1.plusMonths(1);
                     }
@@ -179,8 +173,8 @@ public class ExchangeRateCLI {
     }
 
     private void fetchExchangeRateFromCommercialBanks() {
-        CommercialBankExchangeRate commercialBankExchangeRate = getExchangeRateClient().commercialBankExchangeRate();
-        BigDecimal officialExchangeRate = getExchangeRateClient().getOfficialCurrentExchangeRate();
+        CommercialBankExchangeRate commercialBankExchangeRate = ExchangeRateClient.commercialBankExchangeRate();
+        BigDecimal officialExchangeRate = ExchangeRateClient.getOfficialExchangeRate(LocalDate.now());
 
         StringBuilder result = new StringBuilder("\n");
         result.append(DASH_PROMPT);

@@ -6,7 +6,7 @@ package ni.jug.exchangerate.cb;
  * @version 1.0
  * @since 2.0
  */
-public class CommercialBank {
+public final class CommercialBank {
 
     private final String id;
     private final String description;

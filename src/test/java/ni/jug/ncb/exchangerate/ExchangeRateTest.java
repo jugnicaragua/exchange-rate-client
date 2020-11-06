@@ -77,5 +77,4 @@ public class ExchangeRateTest {
         CommercialBankExchangeRateScraperType scraper = CommercialBankExchangeRateScraperType.BAC;
         scraper.extractData();
     }
-
 }

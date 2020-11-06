@@ -16,9 +16,9 @@ import java.math.BigDecimal;
  */
 public interface CommercialBankExchangeRateScraper {
 
-    String ERROR_FOR_CONNECTING_TO_WEBSITE = "Error de conexion: No se pudo obtener el contenido del sitio web de [%s]";
-    String ERROR_FOR_PARSING_TEXT = "No se pudo extraer el dato: el sitio web de [%s] presenta contenido inesperado: %s";
-    String ERROR_FOR_READING_HTML = "No se pudo extraer el dato: el HTML del sitio web de [%s] ha sido modificado";
+    String ERROR_CONNECTING_TO_WEBSITE = "Error de conexion al sitio web de [%s]";
+    String ERROR_PARSING_TEXT = "El DOM del sitio web de [%s] tiene un formato diferente al esperado: [%s]";
+    String ERROR_READING_HTML = "El DOM del sitio web de [%s] tiene un formato diferente al esperado";
 
     String bank();
 
@@ -43,7 +43,7 @@ public interface CommercialBankExchangeRateScraper {
         Document doc = makeGetRequest();
         Elements elements = doc.select(cssSelector);
         if (elements.size() < expectedMinimumSize) {
-            throw new IllegalArgumentException(String.format(ERROR_FOR_READING_HTML, bank()));
+            throw new IllegalArgumentException(String.format(ERROR_READING_HTML, bank()));
         }
         return elements;
     }
@@ -101,11 +101,11 @@ public interface CommercialBankExchangeRateScraper {
     }
 
     default IllegalArgumentException newParsingError(String value) {
-        return new IllegalArgumentException(String.format(ERROR_FOR_PARSING_TEXT, bank(), value));
+        return new IllegalArgumentException(String.format(ERROR_PARSING_TEXT, bank(), value));
     }
 
     default IllegalArgumentException newConnectionError(IOException ioe) {
-        return new IllegalArgumentException(String.format(ERROR_FOR_CONNECTING_TO_WEBSITE, bank()), ioe);
+        return new IllegalArgumentException(String.format(ERROR_CONNECTING_TO_WEBSITE, bank()), ioe);
     }
 
 }
