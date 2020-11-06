@@ -1,5 +1,6 @@
 package ni.jug.exchangerate.ncb;
 
+import ni.jug.exchangerate.ExchangeRateException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,23 +31,20 @@ public class CentralBankExchangeRateScraper {
 
     public static final String BCN_EXCHANGE_RATE_URL = "https://www.bcn.gob.ni/estadisticas/mercados_cambiarios/tipo_cambio/" +
             "cordoba_dolar/mes.php?";
-    private static final String QUERY_STRING = "mes=%02d&anio=%d";
+    public static final String QUERY_STRING = "mes=%02d&anio=%d";
 
-    public static BigDecimal getExchangeRateByDate(LocalDate date) {
-        MonthlyExchangeRate monthlyExchangeRate = getMonthlyExchangeRate(date);
-        return monthlyExchangeRate.getExchangeRate(date);
-    }
+    public static final String ERROR_DOM_CHANGED = "El DOM de la pagina web del BCN tiene un formato diferente al esperado";
+    public static final String ERROR_BCN_CONNECTION = "Error durante la conexion al sitio web del BCN";
+    public static final String ERROR_YEAR_OUT_OF_BOUNDS = "El año de consulta [%d] debe estar entre [%d, %d] inclusive";
+    public static final String ERROR_NUMBER_OUT_OF_BOUNDS = "%d se encuentra fuera de rango [%d, %d]";
 
-    public static MonthlyExchangeRate getMonthlyExchangeRate(LocalDate date) {
-        return getMonthlyExchangeRate(YearMonth.from(date));
-    }
-
-    public static MonthlyExchangeRate getMonthlyExchangeRate(YearMonth yearMonth) {
+    public static MonthlyExchangeRate getMonthlyExchangeRate(YearMonth yearMonth, int retryMaxCount) throws ExchangeRateException {
         Objects.requireNonNull(yearMonth);
-        doValidateYear(yearMonth);
+        yearInRange(yearMonth);
+        numberInRange(retryMaxCount, 1, 10);
 
         MonthlyExchangeRate monthlyExchangeRate = null;
-        IllegalArgumentException error = null;
+        ExchangeRateException error = null;
         boolean fetched = false;
         int count = 1;
 
@@ -55,10 +53,10 @@ public class CentralBankExchangeRateScraper {
                 LOGGER.log(Level.INFO, "Peticion [{0}]: Importar tasas del sitio web del BCN", count);
                 monthlyExchangeRate = new MonthlyExchangeRate(fetchExchangeRateData(yearMonth));
                 fetched = true;
-            } catch (IllegalArgumentException iae) {
-                error = iae;
+            } catch (ExchangeRateException ex) {
+                error = ex;
             }
-        } while (!fetched && ++count <= 3);
+        } while (!fetched && ++count <= retryMaxCount);
 
         if (!fetched) {
             throw error;
@@ -67,7 +65,7 @@ public class CentralBankExchangeRateScraper {
         return monthlyExchangeRate;
     }
 
-    private static void doValidateYear(YearMonth yearMonth) {
+    private static void yearInRange(YearMonth yearMonth) {
         LocalDate now = LocalDate.now();
         int maximumYear = now.getYear();
 
@@ -75,8 +73,15 @@ public class CentralBankExchangeRateScraper {
             ++maximumYear;
         }
         if (yearMonth.getYear() < MINIMUM_YEAR || yearMonth.getYear() > maximumYear) {
-            throw new IllegalArgumentException("El año de consulta [" + yearMonth.getYear() + "] debe estar entre [" + MINIMUM_YEAR +
-                    ", " + maximumYear + "] inclusive");
+            String msg = String.format(ERROR_YEAR_OUT_OF_BOUNDS, yearMonth.getYear(), MINIMUM_YEAR, maximumYear);
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    private static void numberInRange(int value, int min, int max) {
+        if (value < min || value > max) {
+            String msg = String.format(ERROR_NUMBER_OUT_OF_BOUNDS, value, min, max);
+            throw new IllegalArgumentException(msg);
         }
     }
 
@@ -86,7 +91,7 @@ public class CentralBankExchangeRateScraper {
                 .toString();
     }
 
-    private static TreeMap<LocalDate, BigDecimal> fetchExchangeRateData(YearMonth yearMonth) {
+    private static TreeMap<LocalDate, BigDecimal> fetchExchangeRateData(YearMonth yearMonth) throws ExchangeRateException {
         try {
             String centralBankURL = buildURL(yearMonth);
             Document doc = Jsoup.connect(centralBankURL)
@@ -95,7 +100,7 @@ public class CentralBankExchangeRateScraper {
             Elements divs = doc.select("tbody div[align]");
 
             if (divs.size() <= 2) {
-                throw new IllegalArgumentException("El DOM de la pagina web del BCN tiene un formato diferente al esperado");
+                throw new ExchangeRateException(ERROR_DOM_CHANGED);
             }
 
             Iterator<Element> itr = divs.iterator();
@@ -124,7 +129,7 @@ public class CentralBankExchangeRateScraper {
 
             return exchangeRates;
         } catch (IOException ioe) {
-            throw new IllegalArgumentException("Error durante la conexion al sitio web del BCN", ioe);
+            throw new ExchangeRateException(ERROR_BCN_CONNECTION, ioe);
         }
     }
 }

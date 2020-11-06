@@ -139,8 +139,8 @@ public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTr
         try {
             while (count++ <= 3 && bestTrades.size() < bankCount) {
                 if (count > 2) {
-                    LOGGER.log(Level.INFO, "Repitiendo peticion. Solo se recuperaron datos de {0} de {1} bancos",
-                                new Object[]{bestTrades.size(), bankCount});
+                    LOGGER.log(Level.INFO, "Repitiendo peticion: {0} de {1} bancos fueron recuperados con exito",
+                                new Object[] {bestTrades.size(), bankCount});
                 }
 
                 List<Future<ExchangeRateTrade>> futures = service.invokeAll(tasks);
@@ -168,5 +168,4 @@ public final class CommercialBankExchangeRate implements Iterable<ExchangeRateTr
 
         return new CommercialBankExchangeRate(bestTrades);
     }
-
 }

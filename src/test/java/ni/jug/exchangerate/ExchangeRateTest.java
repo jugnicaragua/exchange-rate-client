@@ -23,13 +23,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ExchangeRateTest {
 
     @Test
-    public void testExchangeRateAtSpecificDate() {
+    public void testExchangeRateAtSpecificDate() throws ExchangeRateException {
         assertEquals(new BigDecimal("31.9396"), ExchangeRateClient.getOfficialExchangeRate(LocalDate.of(2018, 10, 1)));
         assertEquals(new BigDecimal("32.0679"), ExchangeRateClient.getOfficialExchangeRate(LocalDate.of(2018, 10, 31)));
     }
 
     @Test
-    public void testMonthlyExchangeRateAtSpecificDate() {
+    public void testMonthlyExchangeRateAtSpecificDate() throws ExchangeRateException {
         MonthlyExchangeRate monthlyExchangeRate = ExchangeRateClient.getOfficialMonthlyExchangeRate(YearMonth.of(2018, 10));
 
         assertEquals(31, monthlyExchangeRate.size());

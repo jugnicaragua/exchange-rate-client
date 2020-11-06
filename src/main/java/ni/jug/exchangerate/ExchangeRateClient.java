@@ -19,17 +19,23 @@ import java.util.List;
  * @since 2.0
  */
 public final class ExchangeRateClient {
+    public static final int MAX_RETRY_COUNT = 3;
 
-    public static BigDecimal getOfficialExchangeRate(LocalDate date) {
-        return CentralBankExchangeRateScraper.getExchangeRateByDate(date);
+    public static BigDecimal getOfficialExchangeRate(LocalDate date) throws ExchangeRateException {
+        MonthlyExchangeRate monthlyExchangeRate = getOfficialMonthlyExchangeRate(date);
+        return monthlyExchangeRate.getExchangeRate(date);
     }
 
-    public static MonthlyExchangeRate getOfficialMonthlyExchangeRate(YearMonth yearMonth) {
-        return CentralBankExchangeRateScraper.getMonthlyExchangeRate(yearMonth);
+    public static MonthlyExchangeRate getOfficialMonthlyExchangeRate(LocalDate date) throws ExchangeRateException {
+        return getOfficialMonthlyExchangeRate(YearMonth.from(date));
     }
 
-    public static MonthlyExchangeRate getOfficialMonthlyExchangeRate(LocalDate date) {
-        return CentralBankExchangeRateScraper.getMonthlyExchangeRate(date);
+    public static MonthlyExchangeRate getOfficialMonthlyExchangeRate(YearMonth yearMonth) throws ExchangeRateException {
+        return getOfficialMonthlyExchangeRate(yearMonth, MAX_RETRY_COUNT);
+    }
+
+    public static MonthlyExchangeRate getOfficialMonthlyExchangeRate(YearMonth yearMonth, int retryMaxCount) throws ExchangeRateException {
+        return CentralBankExchangeRateScraper.getMonthlyExchangeRate(yearMonth, retryMaxCount);
     }
 
     public static CommercialBankExchangeRate commercialBankExchangeRate() {

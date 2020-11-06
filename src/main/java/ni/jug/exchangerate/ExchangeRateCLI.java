@@ -59,7 +59,7 @@ public class ExchangeRateCLI {
         }
     }
 
-    private void queryBySpecificDates(String value) {
+    private void queryBySpecificDates(String value) throws ExchangeRateException {
         LOGGER.info("Obtener tasa de cambio por fecha");
         BigDecimal exchangeRate;
 
@@ -122,7 +122,7 @@ public class ExchangeRateCLI {
         }
     }
 
-    private void queryBySpecificYearMonths(String value) {
+    private void queryBySpecificYearMonths(String value) throws ExchangeRateException {
         LOGGER.info("Obtener tasa de cambio por año-mes");
         MonthlyExchangeRate monthlyExchangeRate;
 
@@ -172,7 +172,7 @@ public class ExchangeRateCLI {
         }
     }
 
-    private void fetchExchangeRateFromCommercialBanks() {
+    private void fetchExchangeRateFromCommercialBanks() throws ExchangeRateException {
         CommercialBankExchangeRate commercialBankExchangeRate = ExchangeRateClient.commercialBankExchangeRate();
         BigDecimal officialExchangeRate = ExchangeRateClient.getOfficialExchangeRate(LocalDate.now());
 
@@ -204,7 +204,7 @@ public class ExchangeRateCLI {
         LOGGER.info(result.toString());
     }
 
-    public void handleRequest(String[] args) {
+    public void handleRequest(String[] args) throws ExchangeRateException {
         if (args.length == 0) {
             throw new IllegalArgumentException("Se requiere al menos un argumento");
         }
@@ -235,8 +235,8 @@ public class ExchangeRateCLI {
     public static void main(String[] args) {
         try {
             new ExchangeRateCLI().handleRequest(args);
-        } catch (IllegalArgumentException iae) {
-            LOGGER.severe(iae.getMessage());
+        } catch (ExchangeRateException | IllegalArgumentException ex) {
+            LOGGER.severe(ex.getMessage());
             printUsage();
         }
     }
