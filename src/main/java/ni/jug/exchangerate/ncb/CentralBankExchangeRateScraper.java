@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -87,7 +86,7 @@ public class CentralBankExchangeRateScraper {
                 .toString();
     }
 
-    private static Map<LocalDate, BigDecimal> fetchExchangeRateData(YearMonth yearMonth) {
+    private static TreeMap<LocalDate, BigDecimal> fetchExchangeRateData(YearMonth yearMonth) {
         try {
             String centralBankURL = buildURL(yearMonth);
             Document doc = Jsoup.connect(centralBankURL)
@@ -104,7 +103,7 @@ public class CentralBankExchangeRateScraper {
             itr.next();
             itr.next();
 
-            Map<LocalDate, BigDecimal> valuesByDate = new TreeMap<>();
+            TreeMap<LocalDate, BigDecimal> exchangeRates = new TreeMap<>();
             LocalDate date = null;
             BigDecimal value = null;
             while (itr.hasNext()) {
@@ -117,13 +116,13 @@ public class CentralBankExchangeRateScraper {
                 }
 
                 if (date != null && value != null) {
-                    valuesByDate.put(date, value);
+                    exchangeRates.put(date, value);
                     date = null;
                     value = null;
                 }
             }
 
-            return valuesByDate;
+            return exchangeRates;
         } catch (IOException ioe) {
             throw new IllegalArgumentException("Error durante la conexion al sitio web del BCN", ioe);
         }

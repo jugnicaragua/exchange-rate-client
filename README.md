@@ -15,7 +15,7 @@ Los pasos enumerados en los siguientes apartados donde se describe el uso de la 
 - Java 8+.
 - Maven 3+.
 - JUnit 5+.
-- El IDE de tu preferencia: el proyecto no incluye ningún archivo específico de un IDE, pero requiere el uso de un IDE con soporte `maven`.
+- El IDE de tu preferencia: el proyecto no incluye ningún archivo específico de un IDE, pero se recomienda el uso de un IDE con soporte `maven`.
 
 ## Agregar el proyecto como una librería
 
@@ -47,14 +47,11 @@ La clase a cargo de recolectar los datos del tipo de cambio oficial es `NiCentra
 Código de ejemplo para obtener el tipo de cambio oficial del BCN:
 
         // Consultar por fecha
-        ExchangeRateClient client = new ExchangeRateClient();
-
-        Assertions.assertEquals(new BigDecimal("31.9396"), client.getOfficialExchangeRate(LocalDate.of(2018, 10, 1)));
-        Assertions.assertEquals(new BigDecimal("32.0679"), client.getOfficialExchangeRate(LocalDate.of(2018, 10, 31)));
+        Assertions.assertEquals(new BigDecimal("31.9396"), ExchangeRateClient.getOfficialExchangeRate(LocalDate.of(2018, 10, 1)));
+        Assertions.assertEquals(new BigDecimal("32.0679"), ExchangeRateClient.getOfficialExchangeRate(LocalDate.of(2018, 10, 31)));
 
         // Consultar por periodo
-         ExchangeRateClient client = new ExchangeRateClient();
-        MonthlyExchangeRate monthlyExchangeRate = client.getOfficialMonthlyExchangeRate(YearMonth.of(2018, 10));
+        MonthlyExchangeRate monthlyExchangeRate = ExchangeRateClient.getOfficialMonthlyExchangeRate(YearMonth.of(2018, 10));
 
         Assertions.assertEquals(31, monthlyExchangeRate.size());
         Assertions.assertEquals(new BigDecimal("31.9396"), monthlyExchangeRate.getFirstExchangeRate());
@@ -72,7 +69,7 @@ Código de ejemplo para obtener el tipo de cambio oficial del BCN:
 
 Código de ejemplo para obtener las tasas de los bancos comerciales:
 
-        CommercialBankExchangeRate commercialBankExchangeRate = new ExchangeRateClient().commercialBankExchangeRate();
+        CommercialBankExchangeRate commercialBankExchangeRate = ExchangeRateClient.commercialBankExchangeRate();
         StringBuilder result = new StringBuilder("\n");
         for (ExchangeRateTrade trade : commercialBankExchangeRate) {
             result.append(String.format("%-15s", trade.bank()));
@@ -136,4 +133,4 @@ Copyright (c) 2018-present, JUG Nicaragua Armando Alaniz
 **Free Software, Hell Yeah!**
 
 [license]: LICENSE.txt
-[test unitario]: src/test/java/ni/jug/ncb/exchangerate/ExchangeRateScraperTest.java
+[test unitario]: src/test/java/ni/jug/exchangerate/ExchangeRateTest.java

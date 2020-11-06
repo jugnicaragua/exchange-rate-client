@@ -1,14 +1,15 @@
 package ni.jug.exchangerate.ncb;
 
+import ni.jug.util.Dates;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.TreeMap;
-import ni.jug.util.Dates;
 
 /**
  *
@@ -16,68 +17,66 @@ import ni.jug.util.Dates;
  * @version 2.0
  * @since 1.0
  */
-public class MonthlyExchangeRate implements Iterable<Map.Entry<LocalDate, BigDecimal>> {
+public final class MonthlyExchangeRate implements Iterable<Map.Entry<LocalDate, BigDecimal>> {
 
-    private final Map<LocalDate, BigDecimal> valuesByDate;
+    public static final String ERROR_DATE_OUT_OF_BOUNDS = "Fecha fuera de rango. Rango esperado [%s, %s]";
+
+    private final Map<LocalDate, BigDecimal> exchangeRates;
     private final LocalDate firstDate;
     private final LocalDate lastDate;
     private final boolean incomplete;
     private final int size;
 
-    public MonthlyExchangeRate(Map<LocalDate, BigDecimal> exchangeRates) {
-        valuesByDate = Objects.requireNonNull(exchangeRates);
-        if (valuesByDate.isEmpty()) {
+    public MonthlyExchangeRate(TreeMap<LocalDate, BigDecimal> exchangeRates) {
+        this.exchangeRates = Objects.requireNonNull(exchangeRates);
+        if (this.exchangeRates.isEmpty()) {
             firstDate = null;
             lastDate = null;
             incomplete = true;
             size = 0;
         } else {
-            LocalDate _date = valuesByDate.keySet().iterator().next();
-            firstDate = _date.withDayOfMonth(1);
-            lastDate = firstDate.plusMonths(1).minusDays(1);
-            incomplete = valuesByDate.size() != ChronoUnit.DAYS.between(firstDate, lastDate.plusDays(1));
-            size = valuesByDate.size();
+            NavigableSet<LocalDate> dates = (NavigableSet<LocalDate>) this.exchangeRates.keySet();
+            firstDate = dates.first();
+            lastDate = dates.last();
+            incomplete = this.exchangeRates.size() != Dates.daysInMonth(firstDate);
+            size = this.exchangeRates.size();
         }
     }
 
     public Map<LocalDate, BigDecimal> getMonthlyExchangeRate() {
-        return Collections.unmodifiableMap(valuesByDate);
+        return Collections.unmodifiableMap(exchangeRates);
     }
 
     public BigDecimal getExchangeRate(LocalDate date) {
         Objects.requireNonNull(date);
-        return valuesByDate.getOrDefault(date, BigDecimal.ZERO);
+        return exchangeRates.getOrDefault(date, BigDecimal.ZERO);
     }
 
-    public BigDecimal getExchangeRate() {
-        return valuesByDate.getOrDefault(LocalDate.now(), BigDecimal.ZERO);
-    }
+    public Map<LocalDate, BigDecimal> getExchangeRateBetween(LocalDate start, LocalDate end) {
+        Objects.requireNonNull(start);
+        Objects.requireNonNull(end);
 
-    public Map<LocalDate, BigDecimal> getExchangeRateBetween(LocalDate date1, LocalDate date2) {
-        Objects.requireNonNull(date1);
-        Objects.requireNonNull(date2);
+        Dates.validateDateRange(start, end);
 
-        Dates.validateDate1IsBeforeDate2(date1, date2);
-
-        if (date1.compareTo(firstDate) >= 0 && date1.compareTo(lastDate) <= 0 &&
-                date2.compareTo(firstDate) >= 0 && date2.compareTo(lastDate) <= 0) {
+        if (Dates.between(start, firstDate, lastDate) && Dates.between(end, firstDate, lastDate)) {
             Map<LocalDate, BigDecimal> rangeOfValues = new TreeMap<>();
-            while (date1.compareTo(date2) <= 0) {
-                rangeOfValues.put(date1, valuesByDate.getOrDefault(date1, BigDecimal.ZERO));
-                date1 = date1.plusDays(1);
+            while (start.compareTo(end) <= 0) {
+                rangeOfValues.put(start, exchangeRates.getOrDefault(start, BigDecimal.ZERO));
+                start = start.plusDays(1);
             }
             return Collections.unmodifiableMap(rangeOfValues);
         } else {
-            return Collections.emptyMap();
+            String msg = String.format(ERROR_DATE_OUT_OF_BOUNDS, firstDate, lastDate);
+            throw new IllegalArgumentException(msg);
         }
     }
 
     public BigDecimal getFirstExchangeRate() {
-        return valuesByDate.getOrDefault(firstDate, BigDecimal.ZERO);
+        return exchangeRates.getOrDefault(firstDate, BigDecimal.ZERO);
     }
 
     public BigDecimal getLastExchangeRate() {
-        return valuesByDate.getOrDefault(lastDate, BigDecimal.ZERO);
+        return exchangeRates.getOrDefault(lastDate, BigDecimal.ZERO);
     }
 
     public boolean isIncomplete() {
@@ -94,12 +93,11 @@ public class MonthlyExchangeRate implements Iterable<Map.Entry<LocalDate, BigDec
 
     @Override
     public Iterator<Map.Entry<LocalDate, BigDecimal>> iterator() {
-        return valuesByDate.entrySet().iterator();
+        return exchangeRates.entrySet().iterator();
     }
 
     @Override
     public String toString() {
-        return "MonthlyExchangeRate{" + valuesByDate + '}';
+        return "MonthlyExchangeRate{" + exchangeRates + '}';
     }
-
 }

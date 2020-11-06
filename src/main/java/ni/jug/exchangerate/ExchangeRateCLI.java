@@ -86,7 +86,7 @@ public class ExchangeRateCLI {
                     LocalDate date1 = Dates.toLocalDate(range.getFrom());
                     LocalDate date2 = range.getTo() == null ? Dates.getLastDateOfMonthOf(date1) : Dates.toLocalDate(range.getTo());
 
-                    Dates.validateDate1IsBeforeDate2(date1, date2);
+                    Dates.validateDateRange(date1, date2);
 
                     while (date1.compareTo(date2) <= 0) {
                         exchangeRate = ExchangeRateClient.getOfficialExchangeRate(date1);
@@ -150,7 +150,7 @@ public class ExchangeRateCLI {
                     LocalDate date2 = range.getTo() == null ? Dates.getCurrentDateOrLastDayOf(date1) :
                             Dates.toFirstDateOfYearMonth(range.getTo());
 
-                    Dates.validateDate1IsBeforeDate2(date1, date2);
+                    Dates.validateDateRange(date1, date2);
 
                     while (date1.compareTo(date2) <= 0) {
                         monthlyExchangeRate = ExchangeRateClient.getOfficialMonthlyExchangeRate(date1);
@@ -240,5 +240,4 @@ public class ExchangeRateCLI {
             printUsage();
         }
     }
-
 }
