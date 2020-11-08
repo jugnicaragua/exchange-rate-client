@@ -173,7 +173,7 @@ public class ExchangeRateCLI {
     }
 
     private void fetchExchangeRateFromCommercialBanks() throws ExchangeRateException {
-        CommercialBankRequestor commercialBankRequestor = ExchangeRateClient.commercialBankRequestor();
+        CommercialBankRequestor commercialBankRequestor = CommercialBankRequestor.create();
         BigDecimal officialExchangeRate = ExchangeRateClient.getOfficialExchangeRate(LocalDate.now());
 
         StringBuilder result = new StringBuilder("\n");

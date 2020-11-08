@@ -1,6 +1,7 @@
 package ni.jug.exchangerate.ncb;
 
 import ni.jug.exchangerate.ExchangeRateException;
+import ni.jug.util.Inputs;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -36,12 +37,11 @@ public class CentralBankScraper {
     public static final String ERROR_DOM_CHANGED = "El DOM de la pagina web del BCN tiene un formato diferente al esperado";
     public static final String ERROR_BCN_CONNECTION = "Error durante la conexion al sitio web del BCN";
     public static final String ERROR_YEAR_OUT_OF_BOUNDS = "El año de consulta [%d] debe estar entre [%d, %d] inclusive";
-    public static final String ERROR_NUMBER_OUT_OF_BOUNDS = "%d se encuentra fuera de rango [%d, %d]";
 
-    public static MonthlyExchangeRate getMonthlyExchangeRate(YearMonth yearMonth, int retryMaxCount) throws ExchangeRateException {
+    public static MonthlyExchangeRate getMonthlyExchangeRate(YearMonth yearMonth, int maxRetryCount) throws ExchangeRateException {
         Objects.requireNonNull(yearMonth);
+        Inputs.numberInRange(maxRetryCount, 1, 10);
         yearInRange(yearMonth);
-        numberInRange(retryMaxCount, 1, 10);
 
         MonthlyExchangeRate monthlyExchangeRate = null;
         ExchangeRateException error = null;
@@ -56,7 +56,7 @@ public class CentralBankScraper {
             } catch (ExchangeRateException ex) {
                 error = ex;
             }
-        } while (!fetched && ++count <= retryMaxCount);
+        } while (!fetched && ++count <= maxRetryCount);
 
         if (!fetched) {
             throw error;
@@ -74,13 +74,6 @@ public class CentralBankScraper {
         }
         if (yearMonth.getYear() < MINIMUM_YEAR || yearMonth.getYear() > maximumYear) {
             String msg = String.format(ERROR_YEAR_OUT_OF_BOUNDS, yearMonth.getYear(), MINIMUM_YEAR, maximumYear);
-            throw new IllegalArgumentException(msg);
-        }
-    }
-
-    private static void numberInRange(int value, int min, int max) {
-        if (value < min || value > max) {
-            String msg = String.format(ERROR_NUMBER_OUT_OF_BOUNDS, value, min, max);
             throw new IllegalArgumentException(msg);
         }
     }

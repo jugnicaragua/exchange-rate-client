@@ -1,10 +1,13 @@
 package ni.jug.exchangerate.cb;
 
+import ni.jug.util.Inputs;
+
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -31,6 +34,7 @@ public final class CommercialBankRequestor implements Iterable<ExchangeRateTrade
     private final ExchangeRateStatistics statistics;
 
     public CommercialBankRequestor(List<ExchangeRateTrade> commercialBankTrades) {
+        Objects.requireNonNull(commercialBankTrades);
         statistics = commercialBankTrades.stream()
                     .collect(ExchangeRateStatistics::new, ExchangeRateStatistics::accumulate, ExchangeRateStatistics::combine);
 
@@ -119,6 +123,12 @@ public final class CommercialBankRequestor implements Iterable<ExchangeRateTrade
     }
 
     public static CommercialBankRequestor create() {
+        return create(3);
+    }
+
+    public static CommercialBankRequestor create(int retryMaxCount) {
+        Inputs.numberInRange(retryMaxCount, 1, 10);
+
         ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         List<ExchangeRateTrade> trades;
         List<ExchangeRateTrade> bestTrades = Collections.emptyList();
@@ -126,7 +136,7 @@ public final class CommercialBankRequestor implements Iterable<ExchangeRateTrade
         int count = 1;
 
         try {
-            while (count++ <= 3 && bestTrades.size() < bankCount) {
+            while (count++ <= retryMaxCount && bestTrades.size() < bankCount) {
                 if (count > 2) {
                     LOGGER.log(Level.INFO, "Repitiendo peticion: {0} de {1} bancos fueron recuperados con exito",
                                 new Object[] {bestTrades.size(), bankCount});

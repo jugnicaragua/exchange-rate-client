@@ -34,23 +34,23 @@ public final class ExchangeRateClient {
         return getOfficialMonthlyExchangeRate(yearMonth, MAX_RETRY_COUNT);
     }
 
-    public static MonthlyExchangeRate getOfficialMonthlyExchangeRate(YearMonth yearMonth, int retryMaxCount) throws ExchangeRateException {
-        return CentralBankScraper.getMonthlyExchangeRate(yearMonth, retryMaxCount);
+    public static MonthlyExchangeRate getOfficialMonthlyExchangeRate(YearMonth yearMonth, int maxRetryCount) throws ExchangeRateException {
+        return CentralBankScraper.getMonthlyExchangeRate(yearMonth, maxRetryCount);
     }
 
-    public static CommercialBankRequestor commercialBankRequestor() {
-        return CommercialBankRequestor.create();
+    public static List<ExchangeRateTrade> getCommercialBankTrades() {
+        return getCommercialBankTrades(MAX_RETRY_COUNT);
     }
 
-    public static List<ExchangeRateTrade> commercialBankTrades() {
-        return CommercialBankRequestor.create().trades();
+    public static List<ExchangeRateTrade> getCommercialBankTrades(int maxRetryCount) {
+        return CommercialBankRequestor.create(maxRetryCount).trades();
     }
 
-    public static List<ExchangeRateTrade> commercialBankTrades(List<ExchangeRateTrade> trades) {
+    public static List<ExchangeRateTrade> recalculateBestOptions(List<ExchangeRateTrade> trades) {
         return new CommercialBankRequestor(trades).trades();
     }
 
-    public static List<CommercialBank> commercialBanks() {
+    public static List<CommercialBank> commercialBanksCatalogue() {
         return CommercialBankScraper.commercialBanks();
     }
 }
