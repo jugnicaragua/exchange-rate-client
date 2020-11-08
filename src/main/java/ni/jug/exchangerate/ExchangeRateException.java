@@ -21,6 +21,6 @@ public class ExchangeRateException extends Exception {
     }
 
     public ExchangeRateException(Throwable cause, String msg, Object... args) {
-        super(String.format(msg, args));
+        super(String.format(msg, args), cause);
     }
 }

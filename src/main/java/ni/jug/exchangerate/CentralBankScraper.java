@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  * @version 2.0
  * @since 2.0
  */
-public class CentralBankScraper {
+public final class CentralBankScraper {
 
     private static final Logger LOGGER = Logger.getLogger(CentralBankScraper.class.getName());
 
