@@ -1,7 +1,5 @@
 package ni.jug.exchangerate;
 
-import ni.jug.exchangerate.cb.CommercialBankScraper;
-import ni.jug.exchangerate.ncb.MonthlyExchangeRate;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

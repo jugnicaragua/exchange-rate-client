@@ -1,9 +1,6 @@
 package ni.jug.exchangerate;
 
 import ni.jug.cli.CLIHelper;
-import ni.jug.exchangerate.cb.CommercialBankRequestor;
-import ni.jug.exchangerate.cb.ExchangeRateTrade;
-import ni.jug.exchangerate.ncb.MonthlyExchangeRate;
 import ni.jug.util.Dates;
 
 import java.math.BigDecimal;

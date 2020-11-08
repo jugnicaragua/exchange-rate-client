@@ -1,12 +1,5 @@
 package ni.jug.exchangerate;
 
-import ni.jug.exchangerate.cb.CommercialBank;
-import ni.jug.exchangerate.cb.CommercialBankRequestor;
-import ni.jug.exchangerate.cb.CommercialBankScraper;
-import ni.jug.exchangerate.cb.ExchangeRateTrade;
-import ni.jug.exchangerate.ncb.CentralBankScraper;
-import ni.jug.exchangerate.ncb.MonthlyExchangeRate;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;

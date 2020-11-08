@@ -1,4 +1,4 @@
-package ni.jug.exchangerate.cb;
+package ni.jug.exchangerate;
 
 /**
  *

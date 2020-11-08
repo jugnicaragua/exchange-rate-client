@@ -1,4 +1,4 @@
-package ni.jug.exchangerate.ncb;
+package ni.jug.exchangerate;
 
 import ni.jug.util.Dates;
 

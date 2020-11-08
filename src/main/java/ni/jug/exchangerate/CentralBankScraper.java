@@ -1,6 +1,5 @@
-package ni.jug.exchangerate.ncb;
+package ni.jug.exchangerate;
 
-import ni.jug.exchangerate.ExchangeRateException;
 import ni.jug.util.Inputs;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
