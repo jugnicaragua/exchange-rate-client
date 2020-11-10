@@ -130,6 +130,7 @@ public final class CommercialBankRequestor implements Iterable<ExchangeRateTrade
         Inputs.numberInRange(retryMaxCount, 1, 10);
 
         ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        List<Callable<ExchangeRateTrade>> tasks = CommercialBankScraper.createTasks();
         List<ExchangeRateTrade> trades;
         List<ExchangeRateTrade> bestTrades = Collections.emptyList();
         int bankCount = CommercialBankScraper.bankCount();
@@ -142,7 +143,6 @@ public final class CommercialBankRequestor implements Iterable<ExchangeRateTrade
                                 new Object[] {bestTrades.size(), bankCount});
                 }
 
-                List<Callable<ExchangeRateTrade>> tasks = CommercialBankScraper.createTasks();
                 List<Future<ExchangeRateTrade>> futures = service.invokeAll(tasks);
                 trades = futures.stream()
                             .map(f -> {
