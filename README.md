@@ -2,7 +2,7 @@
 
 La librería es un cliente http que obtiene el tipo de cambio oficial del Banco Central de Nicaragua (BCN) y la compra/venta de divisas de los bancos comerciales que operan en Nicaragua. Para el caso del BCN, la libreria expone las mismas operaciones disponibles en el servicio web del BCN: una vez obtenidos los datos del tipo de cambio, se pueden consultar por fecha y mes-año. En el caso de los bancos comerciales, se realiza `scraping` de los siguientes bancos: BANPRO, FICOHSA, AVANZ, BAC, BDF, LAFISE. Si el `scraping` de alguno de los bancos falla, la libreria realiza 3 intentos (cada intento consiste en extraer los datos de todos los bancos) y retorna los resultados del mejor intento (aquel intento con mayor cantidad de bancos disponibles).
 
-La libreria puede ser empaquetada a traves de `maven` para crear un `cli` (aplicacion de consola). Para construir el proyecto como `cli` se debe activar un perfil declarado en el pom.xml del proyecto (mas detalles en los siguientes apartados).
+La libreria puede ser empaquetada a traves de `maven` para crear un `cli` (aplicacion de consola). Para construir el proyecto como `cli` se debe activar un perfil declarado en el pom.xml del proyecto (mas detalles en los siguientes apartados)..
 
 #### Observacion
 
