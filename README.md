@@ -1,5 +1,5 @@
 [![Gradle Package](https://github.com/jugnicaragua/exchange-rate-client/actions/workflows/gradle-publish.yml/badge.svg)](https://github.com/jugnicaragua/exchange-rate-client/actions/workflows/gradle-publish.yml)
-
+[![Maven Package](https://github.com/jugnicaragua/exchange-rate-client/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/jugnicaragua/exchange-rate-client/actions/workflows/maven-publish.yml)
 
 
 # exchange-rate-client
