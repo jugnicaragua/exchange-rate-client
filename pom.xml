@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ni.jug</groupId>
     <artifactId>exchange-rate-client</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <description>Libreria para obtener los datos de intercambio del córdoba con respecto al dólar</description>
 
