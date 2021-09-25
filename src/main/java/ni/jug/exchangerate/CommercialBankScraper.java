@@ -25,7 +25,8 @@ import java.util.stream.Stream;
  */
 public enum CommercialBankScraper {
 
-    BANPRO("Banco de la Produccion", "https://www.banprogrupopromerica.com.ni/umbraco/Surface/TipoCambio/Run?json={\"operacion\":2}") {
+    BANPRO("Banco de la Produccion", "https://www.banprogrupopromerica.com.ni/umbraco/Surface/TipoCambio/Run?" +
+            "json=%7B%22operacion%22%3A2%7D") {
         private static final String OPEN_TAG = "\\u003cTD class=gris10px height=20 vAlign=middle width=75 align=center\\u003e";
         private static final String CLOSE_TAG = "\\u003c/TD\\u003e";
 
@@ -86,7 +87,6 @@ public enum CommercialBankScraper {
         Document getRequest() throws ExchangeRateException {
             try {
                 return Jsoup.connect(url())
-                        .validateTLSCertificates(false)
                         .cookies(ExecutionContext.getInstance().cookies(bank()))
                         .userAgent(UA_FIREFOX_V64)
                         .get();
@@ -131,7 +131,6 @@ public enum CommercialBankScraper {
         String getRequestAsTextPlain() throws ExchangeRateException {
             try {
                 return Jsoup.connect(url())
-                        .validateTLSCertificates(false)
                         .cookies(ExecutionContext.getInstance().cookies(bank()))
                         .header("Content-Type", "application/json;charset=UTF-8")
                         .requestBody(payload)
@@ -195,7 +194,6 @@ public enum CommercialBankScraper {
     Document getRequest() throws ExchangeRateException {
         try {
             return Jsoup.connect(url())
-                    .validateTLSCertificates(false)
                     .cookies(ExecutionContext.getInstance().cookies(bank()))
                     .get();
         } catch (IOException ioe) {
@@ -206,7 +204,6 @@ public enum CommercialBankScraper {
     String getRequestAsTextPlain() throws ExchangeRateException {
         try {
             return Jsoup.connect(url())
-                    .validateTLSCertificates(false)
                     .cookies(ExecutionContext.getInstance().cookies(bank()))
                     .ignoreContentType(true)
                     .execute()

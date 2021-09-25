@@ -29,8 +29,7 @@ public final class CentralBankScraper {
 
     public static final int MINIMUM_YEAR = 2012;
 
-    public static final String BCN_EXCHANGE_RATE_URL = "https://www.bcn.gob.ni/estadisticas/mercados_cambiarios/tipo_cambio/" +
-            "cordoba_dolar/mes.php?";
+    public static final String BCN_EXCHANGE_RATE_URL = "https://www.bcn.gob.ni/IRR/tipo_cambio_mensual/mes.php";
     public static final String QUERY_STRING = "mes=%02d&anio=%d";
 
     public static final String ERROR_DOM_CHANGED = "El DOM de la pagina web del BCN tiene un formato diferente al esperado";
@@ -79,6 +78,7 @@ public final class CentralBankScraper {
 
     private static String buildURL(YearMonth yearMonth) {
         return new StringBuilder(BCN_EXCHANGE_RATE_URL)
+                .append('?')
                 .append(String.format(QUERY_STRING, yearMonth.getMonthValue(), yearMonth.getYear()))
                 .toString();
     }
@@ -87,7 +87,6 @@ public final class CentralBankScraper {
         try {
             String centralBankURL = buildURL(yearMonth);
             Document doc = Jsoup.connect(centralBankURL)
-                    .validateTLSCertificates(false)
                     .get();
             Elements divs = doc.select("tbody div[align]");
 
