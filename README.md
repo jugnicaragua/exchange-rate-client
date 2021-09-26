@@ -1,6 +1,13 @@
 [![Build](https://github.com/jugnicaragua/exchange-rate-client/actions/workflows/build.yml/badge.svg)](https://github.com/jugnicaragua/exchange-rate-client/actions/workflows/build.yml)
 [![Gradle Package](https://github.com/jugnicaragua/exchange-rate-client/actions/workflows/gradle-publish.yml/badge.svg)](https://github.com/jugnicaragua/exchange-rate-client/actions/workflows/gradle-publish.yml)
 [![Maven Package](https://github.com/jugnicaragua/exchange-rate-client/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/jugnicaragua/exchange-rate-client/actions/workflows/maven-publish.yml)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=jugnicaragua_exchange-rate-client&metric=bugs)](https://sonarcloud.io/dashboard?id=jugnicaragua_exchange-rate-client)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=jugnicaragua_exchange-rate-client&metric=code_smells)](https://sonarcloud.io/dashboard?id=jugnicaragua_exchange-rate-client)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=jugnicaragua_exchange-rate-client&metric=coverage)](https://sonarcloud.io/dashboard?id=jugnicaragua_exchange-rate-client)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=jugnicaragua_exchange-rate-client&metric=sqale_index)](https://sonarcloud.io/dashboard?id=jugnicaragua_exchange-rate-client)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=jugnicaragua_exchange-rate-client&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=jugnicaragua_exchange-rate-client)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=jugnicaragua_exchange-rate-client&metric=security_rating)](https://sonarcloud.io/dashboard?id=jugnicaragua_exchange-rate-client)
+
 
 
 # exchange-rate-client
