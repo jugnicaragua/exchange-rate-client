@@ -101,6 +101,10 @@ public final class MonthlyExchangeRate implements Iterable<Map.Entry<LocalDate, 
         }
     }
 
+    public static MonthlyExchangeRate create() {
+        return new MonthlyExchangeRate(Collections.emptyMap(), null, null, true, 0);
+    }
+
     @Override
     public String toString() {
         return "MonthlyExchangeRate{" +

@@ -32,15 +32,15 @@ public class CentralBankScraperRetryDecorator implements CentralBankQuery {
 
     @Override
     public BigDecimal getExchangeRate(LocalDate date) throws ExchangeRateException {
-        return retry(date, delegator::getExchangeRate);
+        return retry(date, delegator::getExchangeRate, BigDecimal.ZERO);
     }
 
     @Override
     public MonthlyExchangeRate getMonthlyExchangeRate(YearMonth period) throws ExchangeRateException {
-        return retry(period, delegator::getMonthlyExchangeRate);
+        return retry(period, delegator::getMonthlyExchangeRate, MonthlyExchangeRate.create());
     }
 
-    private <I, O> O retry(I input, CentralBankFunctionWrapper<I, O> scraper) throws ExchangeRateException {
+    private <I, O> O retry(I input, CentralBankFunctionWrapper<I, O> scraper, O defaultValue) throws ExchangeRateException {
         ExchangeRateException lastError = null;
 
         for (int i = 1; i <= retry; i++) {
@@ -59,6 +59,10 @@ public class CentralBankScraperRetryDecorator implements CentralBankQuery {
             }
         }
 
-        throw lastError;
+        if (lastError != null) {
+            throw lastError;
+        }
+
+        return defaultValue;
     }
 }
