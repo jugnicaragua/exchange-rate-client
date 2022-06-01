@@ -68,9 +68,10 @@ public enum BankScraper {
 
         @Override
         public ExchangeRateTrade fetchData() throws ExchangeRateException {
-            Elements scripts = queryCssSelector(4, "script:not(script[type])");
+            Elements scripts = queryCssSelector(5, "script:not(script[type])");
 
             Iterator<Element> itr = scripts.iterator();
+            itr.next();
             itr.next();
             itr.next();
             itr.next();
