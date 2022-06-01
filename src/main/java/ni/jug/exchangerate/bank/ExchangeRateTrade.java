@@ -1,4 +1,4 @@
-package ni.jug.exchangerate;
+package ni.jug.exchangerate.bank;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -7,10 +7,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 /**
- *
- * @author Armando Alaniz
- * @version 1.0
- * @since 1.0
+ * @author aalaniz
  */
 public final class ExchangeRateTrade {
 
@@ -140,8 +137,17 @@ public final class ExchangeRateTrade {
 
     @Override
     public String toString() {
-        return "ExchangeRateTrade{" + "bank=" + bank + ", date=" + date + ", buy=" + buy + ", sell=" + sell + ", bestBuyPrice=" +
-                bestBuyPrice + ", bestSellPrice=" + bestSellPrice + ", worstBuyPrice=" + worstBuyPrice + ", worstSellPrice=" +
-                worstSellPrice + '}';
+        return "ExchangeRateTrade{" +
+                "bank='" + bank + '\'' +
+                ", date=" + date +
+                ", buy=" + buy +
+                ", sell=" + sell +
+                ", bestBuyPrice=" + bestBuyPrice +
+                ", bestSellPrice=" + bestSellPrice +
+                ", worstBuyPrice=" + worstBuyPrice +
+                ", worstSellPrice=" + worstSellPrice +
+                ", start=" + start +
+                ", end=" + end +
+                '}';
     }
 }

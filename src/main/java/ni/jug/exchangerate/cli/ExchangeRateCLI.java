@@ -1,10 +1,15 @@
-package ni.jug.exchangerate;
+package ni.jug.exchangerate.cli;
 
-import ni.jug.cli.CLIHelper;
+import ni.jug.exchangerate.ExchangeRateClient;
+import ni.jug.exchangerate.ExchangeRateException;
+import ni.jug.exchangerate.bank.BankExchangeRateSummary;
+import ni.jug.exchangerate.bank.ExchangeRateTrade;
+import ni.jug.exchangerate.centralbank.MonthlyExchangeRate;
 import ni.jug.util.Dates;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
 import java.util.logging.Level;
@@ -13,9 +18,7 @@ import java.util.stream.Collectors;
 
 /**
  *
- * @author Armando Alaniz
- * @version 2.0
- * @since 1.0
+ * @author aalaniz
  */
 public class ExchangeRateCLI {
 
@@ -70,7 +73,9 @@ public class ExchangeRateCLI {
 
                 try {
                     LocalDate date = Dates.toLocalDate(strDate);
-                    exchangeRate = ExchangeRateClient.getOfficialExchangeRate(date);
+                    exchangeRate = ExchangeRateClient.INSTANCE
+                            .centralBankQuery()
+                            .getExchangeRate(date);
 
                     doAppendExchangeRateByDate(date, exchangeRate, result);
                 } catch (DateTimeParseException dtpe) {
@@ -86,7 +91,9 @@ public class ExchangeRateCLI {
                     Dates.validateDateRange(date1, date2);
 
                     while (date1.compareTo(date2) <= 0) {
-                        exchangeRate = ExchangeRateClient.getOfficialExchangeRate(date1);
+                        exchangeRate = ExchangeRateClient.INSTANCE
+                                .centralBankQuery()
+                                .getExchangeRate(date1);
                         doAppendExchangeRateByDate(date1, exchangeRate, result);
                         date1 = date1.plusDays(1);
                     }
@@ -132,8 +139,10 @@ public class ExchangeRateCLI {
                 String yearMonth = (String) obj;
 
                 try {
-                    LocalDate date = Dates.toFirstDateOfYearMonth(yearMonth);
-                    monthlyExchangeRate = ExchangeRateClient.getOfficialMonthlyExchangeRate(date);
+                    YearMonth period = YearMonth.parse(yearMonth);
+                    monthlyExchangeRate = ExchangeRateClient.INSTANCE
+                            .centralBankQuery()
+                            .getMonthlyExchangeRate(period);
 
                     doAppendMonthlyExchangeRate(monthlyExchangeRate, result);
                 } catch (DateTimeParseException dtpe) {
@@ -150,7 +159,9 @@ public class ExchangeRateCLI {
                     Dates.validateDateRange(date1, date2);
 
                     while (date1.compareTo(date2) <= 0) {
-                        monthlyExchangeRate = ExchangeRateClient.getOfficialMonthlyExchangeRate(date1);
+                        monthlyExchangeRate = ExchangeRateClient.INSTANCE
+                                .centralBankQuery()
+                                .getMonthlyExchangeRate(YearMonth.from(date1));
                         doAppendMonthlyExchangeRate(monthlyExchangeRate, result);
                         date1 = date1.plusMonths(1);
                     }
@@ -170,13 +181,17 @@ public class ExchangeRateCLI {
     }
 
     private void fetchExchangeRateFromCommercialBanks() throws ExchangeRateException {
-        CommercialBankRequestor commercialBankRequestor = CommercialBankRequestor.create();
-        BigDecimal officialExchangeRate = ExchangeRateClient.getOfficialExchangeRate(LocalDate.now());
+        BankExchangeRateSummary bankExchangeRateSummary = ExchangeRateClient.INSTANCE
+                .bankQuery()
+                .bankSummary();
+        BigDecimal officialExchangeRate = ExchangeRateClient.INSTANCE
+                .centralBankQuery()
+                .getExchangeRate(LocalDate.now());
 
         StringBuilder result = new StringBuilder("\n");
         result.append(DASH_PROMPT);
         result.append("Bancos no disponibles: ");
-        result.append(commercialBankRequestor.unavailableBanks().stream().collect(Collectors.joining(", ")));
+        result.append(bankExchangeRateSummary.unavailableBanks().stream().collect(Collectors.joining(", ")));
         result.append("\n");
         result.append(DASH_PROMPT);
         result.append("\n");
@@ -187,7 +202,7 @@ public class ExchangeRateCLI {
         result.append(String.format("%12s", "Oficial"));
         result.append("\n");
         result.append(DASH_PROMPT);
-        for (ExchangeRateTrade trade : commercialBankRequestor) {
+        for (ExchangeRateTrade trade : bankExchangeRateSummary) {
             result.append(String.format("%-15s", trade.bank()));
             String sell = trade.sell().toPlainString() + (trade.isBestSellPrice() ? "*" : "");
             result.append(String.format("%12s", sell));

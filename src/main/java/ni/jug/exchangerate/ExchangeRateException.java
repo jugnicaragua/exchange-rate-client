@@ -1,10 +1,7 @@
 package ni.jug.exchangerate;
 
 /**
- *
  * @author aalaniz
- * @version 1.0
- * @since 3.0
  */
 public class ExchangeRateException extends Exception {
 
@@ -16,11 +13,11 @@ public class ExchangeRateException extends Exception {
         super(message, cause);
     }
 
-    public ExchangeRateException(String msg, Object... args) {
-        this(null, msg, args);
+    public ExchangeRateException(String message, Object... args) {
+        this(message, null, args);
     }
 
-    public ExchangeRateException(Throwable cause, String msg, Object... args) {
-        super(String.format(msg, args), cause);
+    public ExchangeRateException(String message, Throwable cause, Object... args) {
+        super(String.format(message, args), cause);
     }
 }

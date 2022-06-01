@@ -1,4 +1,4 @@
-package ni.jug.cli;
+package ni.jug.exchangerate.cli;
 
 import ni.jug.util.Strings;
 
@@ -8,9 +8,7 @@ import java.util.Objects;
 
 /**
  *
- * @author Armando Alaniz
- * @version 1.0
- * @since 1.0
+ * @author aalaniz
  */
 public final class CLIHelper {
 

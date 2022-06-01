@@ -5,15 +5,16 @@ package ni.jug.util;
  */
 public final class Inputs {
 
-    public static final String ERROR_NUMBER_OUT_OF_BOUNDS = "%d se encuentra fuera de rango [%d, %d]";
+    public static final String ERROR_NUMBER_OUT_OF_BOUNDS = "%d se encuentra fuera de rango [%d, %d].";
 
     private Inputs() {
     }
 
-    public static void numberInRange(int value, int min, int max) {
+    public static int numberInRange(int value, int min, int max) {
         if (value < min || value > max) {
             String msg = String.format(ERROR_NUMBER_OUT_OF_BOUNDS, value, min, max);
             throw new IllegalArgumentException(msg);
         }
+        return value;
     }
 }

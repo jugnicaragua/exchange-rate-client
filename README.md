@@ -81,9 +81,9 @@ Código de ejemplo para obtener el tipo de cambio oficial del BCN:
 
 Código de ejemplo para obtener las tasas de los bancos comerciales:
 
-        CommercialBankRequestor commercialBankRequestor = ExchangeRateClient.commercialBankRequestor();
+        CommercialBankRequestor bankExchangeRateSummary = ExchangeRateClient.bankExchangeRateSummary();
         StringBuilder result = new StringBuilder("\n");
-        for (ExchangeRateTrade trade : commercialBankRequestor) {
+        for (ExchangeRateTrade trade : bankExchangeRateSummary) {
             result.append(String.format("%-15s", trade.bank()));
             String sell = trade.sell().toPlainString() + (trade.isBestSellPrice() ? "*" : "");
             result.append(String.format("%12s", sell));

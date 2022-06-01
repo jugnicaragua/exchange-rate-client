@@ -1,4 +1,4 @@
-package ni.jug.exchangerate;
+package ni.jug.exchangerate.bank;
 
 import java.util.Collections;
 import java.util.Map;
@@ -8,9 +8,7 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  *
- * @author Armando Alaniz
- * @version 2.0
- * @since 1.0
+ * @author aalaniz
  */
 public final class ExecutionContext {
 

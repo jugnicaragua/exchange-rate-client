@@ -1,4 +1,4 @@
-package ni.jug.exchangerate;
+package ni.jug.exchangerate.centralbank;
 
 import ni.jug.util.Dates;
 
@@ -7,40 +7,32 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.TreeMap;
 
 /**
  *
- * @author Armando Alaniz
- * @version 2.0
- * @since 1.0
+ * @author aalaniz
  */
 public final class MonthlyExchangeRate implements Iterable<Map.Entry<LocalDate, BigDecimal>> {
 
-    public static final String ERROR_DATE_OUT_OF_BOUNDS = "Fecha fuera de rango. Rango esperado [%s, %s]";
+    public static final String ERROR_DATE_OUT_OF_BOUNDS = "Fecha fuera de rango. Rango esperado [%s, %s].";
 
     private final Map<LocalDate, BigDecimal> exchangeRates;
     private final LocalDate firstDate;
     private final LocalDate lastDate;
-    private final boolean incomplete;
+    private final boolean hasGaps;
     private final int size;
 
-    public MonthlyExchangeRate(TreeMap<LocalDate, BigDecimal> exchangeRates) {
-        this.exchangeRates = Objects.requireNonNull(exchangeRates);
-        if (this.exchangeRates.isEmpty()) {
-            firstDate = null;
-            lastDate = null;
-            incomplete = true;
-            size = 0;
-        } else {
-            NavigableSet<LocalDate> dates = (NavigableSet<LocalDate>) this.exchangeRates.keySet();
-            firstDate = dates.first();
-            lastDate = dates.last();
-            incomplete = this.exchangeRates.size() != Dates.daysInMonth(firstDate);
-            size = this.exchangeRates.size();
-        }
+    private MonthlyExchangeRate(Map<LocalDate, BigDecimal> exchangeRates, LocalDate firstDate, LocalDate lastDate, boolean hasGaps,
+            int size) {
+        this.exchangeRates = exchangeRates;
+        this.firstDate = firstDate;
+        this.lastDate = lastDate;
+        this.hasGaps = hasGaps;
+        this.size = size;
     }
 
     public Map<LocalDate, BigDecimal> getMonthlyExchangeRate() {
@@ -79,8 +71,8 @@ public final class MonthlyExchangeRate implements Iterable<Map.Entry<LocalDate, 
         return exchangeRates.getOrDefault(lastDate, BigDecimal.ZERO);
     }
 
-    public boolean isIncomplete() {
-        return incomplete;
+    public boolean isHasGaps() {
+        return hasGaps;
     }
 
     public int size() {
@@ -96,8 +88,27 @@ public final class MonthlyExchangeRate implements Iterable<Map.Entry<LocalDate, 
         return exchangeRates.entrySet().iterator();
     }
 
+    public static MonthlyExchangeRate create(NavigableMap<LocalDate, BigDecimal> exchangeRates) {
+        Objects.requireNonNull(exchangeRates);
+        if (exchangeRates.isEmpty()) {
+            return new MonthlyExchangeRate(Collections.emptyMap(), null, null, true, 0);
+        } else {
+            NavigableSet<LocalDate> dates = exchangeRates.navigableKeySet();
+            LocalDate first = dates.first();
+            LocalDate last = dates.last();
+            boolean withGaps = exchangeRates.size() != Dates.daysInMonth(first);
+            return new MonthlyExchangeRate(exchangeRates, first, last, withGaps, exchangeRates.size());
+        }
+    }
+
     @Override
     public String toString() {
-        return "MonthlyExchangeRate{" + exchangeRates + '}';
+        return "MonthlyExchangeRate{" +
+                "exchangeRates=" + exchangeRates +
+                ", firstDate=" + firstDate +
+                ", lastDate=" + lastDate +
+                ", hasGaps=" + hasGaps +
+                ", size=" + size +
+                '}';
     }
 }

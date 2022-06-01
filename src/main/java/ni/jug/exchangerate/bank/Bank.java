@@ -1,21 +1,22 @@
-package ni.jug.exchangerate;
+package ni.jug.exchangerate.bank;
 
 /**
- *
  * @author aalaniz
- * @version 1.0
- * @since 2.0
  */
-public final class CommercialBank {
+public final class Bank {
 
     private final String id;
     private final String description;
     private final String url;
 
-    public CommercialBank(String id, String description, String url) {
+    public Bank(String id, String description, String url) {
         this.id = id;
         this.description = description;
         this.url = url;
+    }
+
+    public Bank(BankScraper scraper) {
+        this(scraper.bank(), scraper.description(), scraper.url());
     }
 
     public String getId() {
@@ -32,7 +33,7 @@ public final class CommercialBank {
 
     @Override
     public String toString() {
-        return "CommercialBank{" +
+        return "Bank{" +
                 "id='" + id + '\'' +
                 ", description='" + description + '\'' +
                 ", url='" + url + '\'' +

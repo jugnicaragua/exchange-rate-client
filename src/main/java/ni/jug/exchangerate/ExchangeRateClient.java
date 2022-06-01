@@ -1,49 +1,29 @@
 package ni.jug.exchangerate;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.util.List;
+import ni.jug.exchangerate.bank.BankQuery;
+import ni.jug.exchangerate.centralbank.CentralBankQuery;
+import ni.jug.exchangerate.centralbank.CentralBankScraper;
+import ni.jug.exchangerate.centralbank.CentralBankScraperRetryDecorator;
 
 /**
- *
- * @author Armando Alaniz
- * @version 4.0
- * @since 2.0
+ * @author aalaniz
  */
 public final class ExchangeRateClient {
-    public static final int MAX_RETRY_COUNT = 3;
 
-    public static BigDecimal getOfficialExchangeRate(LocalDate date) throws ExchangeRateException {
-        MonthlyExchangeRate monthlyExchangeRate = getOfficialMonthlyExchangeRate(date);
-        return monthlyExchangeRate.getExchangeRate(date);
+    public static final ExchangeRateClient INSTANCE = new ExchangeRateClient();
+
+    private ExchangeRateClient() {
     }
 
-    public static MonthlyExchangeRate getOfficialMonthlyExchangeRate(LocalDate date) throws ExchangeRateException {
-        return getOfficialMonthlyExchangeRate(YearMonth.from(date));
+    public CentralBankQuery centralBankQuery() {
+        return new CentralBankScraperRetryDecorator(CentralBankScraper.INSTANCE);
     }
 
-    public static MonthlyExchangeRate getOfficialMonthlyExchangeRate(YearMonth yearMonth) throws ExchangeRateException {
-        return getOfficialMonthlyExchangeRate(yearMonth, MAX_RETRY_COUNT);
+    public CentralBankQuery centralBankQuery(int retry) {
+        return new CentralBankScraperRetryDecorator(CentralBankScraper.INSTANCE, retry);
     }
 
-    public static MonthlyExchangeRate getOfficialMonthlyExchangeRate(YearMonth yearMonth, int maxRetryCount) throws ExchangeRateException {
-        return CentralBankScraper.getMonthlyExchangeRate(yearMonth, maxRetryCount);
-    }
-
-    public static List<ExchangeRateTrade> getCommercialBankTrades() {
-        return getCommercialBankTrades(MAX_RETRY_COUNT);
-    }
-
-    public static List<ExchangeRateTrade> getCommercialBankTrades(int maxRetryCount) {
-        return CommercialBankRequestor.create(maxRetryCount).trades();
-    }
-
-    public static List<ExchangeRateTrade> recalculateBestOptions(List<ExchangeRateTrade> trades) {
-        return new CommercialBankRequestor(trades).trades();
-    }
-
-    public static List<CommercialBank> commercialBanksCatalogue() {
-        return CommercialBankScraper.commercialBanks();
+    public BankQuery bankQuery() {
+        return BankQuery.INSTANCE;
     }
 }

@@ -1,5 +1,6 @@
-package ni.jug.exchangerate;
+package ni.jug.exchangerate.bank;
 
+import ni.jug.exchangerate.ExchangeRateException;
 import ni.jug.util.Strings;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -10,6 +11,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -18,12 +20,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- *
- * @author Armando Alaniz
- * @version 3.0
- * @since 1.0
+ * @author aalaniz
  */
-public enum CommercialBankScraper {
+public enum BankScraper {
 
     BANPRO("Banco de la Produccion", "https://www.banprogrupopromerica.com.ni/umbraco/Surface/TipoCambio/Run?" +
             "json=%7B%22operacion%22%3A2%7D") {
@@ -149,30 +148,30 @@ public enum CommercialBankScraper {
         }
     };
 
-    private static final Logger LOGGER = Logger.getLogger(CommercialBankScraper.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(BankScraper.class.getName());
 
-    public static final String ERROR_BANK_CONNECTION = "Error durante la conexion al sitio web de [%s]";
-    public static final String ERROR_PARSING_TEXT = "El DOM del sitio web de [%s] tiene un formato diferente al esperado: [%s]";
-    public static final String ERROR_READING_HTML = "El DOM del sitio web de [%s] tiene un formato diferente al esperado";
+    public static final String ERROR_BANK_CONNECTION = "Error durante la conexion al sitio web de [%s].";
+    public static final String ERROR_PARSING_TEXT = "El DOM del sitio web de [%s] tiene un formato diferente al esperado: [%s].";
+    public static final String ERROR_READING_HTML = "El DOM del sitio web de [%s] tiene un formato diferente al esperado.";
 
-    private static final int BANK_COUNT = CommercialBankScraper.values().length;
-    private static final List<CommercialBank> COMMERCIAL_BANKS = new ArrayList<>(BANK_COUNT);
+    private static final int BANK_COUNT = BankScraper.values().length;
+    private static final List<Bank> BANKS = new ArrayList<>(BANK_COUNT);
 
     static {
-        for (CommercialBankScraper bankScraper : CommercialBankScraper.values()) {
-            COMMERCIAL_BANKS.add(new CommercialBank(bankScraper.bank(), bankScraper.description(), bankScraper.url()));
+        for (BankScraper scraper : BankScraper.values()) {
+            BANKS.add(new Bank(scraper));
         }
     }
 
     private final String description;
     private final String url;
 
-    CommercialBankScraper(String description, String url) {
+    BankScraper(String description, String url) {
         this.description = description;
         this.url = url;
     }
 
-    CommercialBankScraper(String url) {
+    BankScraper(String url) {
         this.description = name();
         this.url = url;
     }
@@ -268,7 +267,7 @@ public enum CommercialBankScraper {
     }
 
     ExchangeRateException connectionError(IOException ex) {
-        return new ExchangeRateException(ex, ERROR_BANK_CONNECTION, bank());
+        return new ExchangeRateException(ERROR_BANK_CONNECTION, ex, bank());
     }
 
     public Callable<ExchangeRateTrade> createTask() {
@@ -282,21 +281,21 @@ public enum CommercialBankScraper {
         };
     }
 
-    public static int bankCount() {
+    public static int count() {
         return BANK_COUNT;
     }
 
-    public static List<CommercialBank> commercialBanks() {
-        return COMMERCIAL_BANKS;
+    public static List<Bank> banks() {
+        return Collections.unmodifiableList(BANKS);
     }
 
-    public static List<Callable<ExchangeRateTrade>> createTasks() {
+    public static List<Callable<ExchangeRateTrade>> createAsyncTasks() {
         return Stream.of(values())
-                .map(CommercialBankScraper::createTask)
+                .map(BankScraper::createTask)
                 .collect(Collectors.toList());
     }
 
-    class Delimiter {
+    private static class Delimiter {
         private final String left;
         private final String right;
 

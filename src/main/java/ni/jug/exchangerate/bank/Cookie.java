@@ -1,12 +1,9 @@
-package ni.jug.exchangerate;
+package ni.jug.exchangerate.bank;
 
 import java.util.Objects;
 
 /**
- *
- * @author Armando Alaniz
- * @version 1.0
- * @since 1.0
+ * @author aalaniz
  */
 public final class Cookie {
 
@@ -46,7 +43,9 @@ public final class Cookie {
 
     @Override
     public String toString() {
-        return "Cookie{" + name + '=' + value + '}';
+        return "Cookie{" +
+                "name='" + name + '\'' +
+                ", value='" + value + '\'' +
+                '}';
     }
-
 }

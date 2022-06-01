@@ -6,10 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 /**
- *
- * @author Armando Alaniz
- * @version 2.0
- * @since 1.0
+ * @author aalaniz
  */
 public final class Dates {
 
