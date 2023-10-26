@@ -12,6 +12,9 @@ public final class ExchangeRateClient { //Comentando mi gente
 
     public static final ExchangeRateClient INSTANCE = new ExchangeRateClient();
 
+    /**
+     * This is a default public constructor.
+     */
     private ExchangeRateClient() {
     }
 
