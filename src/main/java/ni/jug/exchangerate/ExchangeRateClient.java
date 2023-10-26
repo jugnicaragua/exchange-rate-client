@@ -8,7 +8,7 @@ import ni.jug.exchangerate.centralbank.CentralBankScraperRetryDecorator;
 /**
  * @author aalaniz
  */
-public final class ExchangeRateClient {
+public final class ExchangeRateClient { //Comentando mi gente
 
     public static final ExchangeRateClient INSTANCE = new ExchangeRateClient();
 
