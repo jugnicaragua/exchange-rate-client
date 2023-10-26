@@ -22,6 +22,8 @@ public final class ExchangeRateClient { //Comentando mi gente
         return new CentralBankScraperRetryDecorator(CentralBankScraper.INSTANCE);
     }
 
+    // @vato_dev
+
     public CentralBankQuery centralBankQuery(int retry) {
         return new CentralBankScraperRetryDecorator(CentralBankScraper.INSTANCE, retry);
     }
